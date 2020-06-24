@@ -1,0 +1,65 @@
+{
+    "Name": "test_job_flow",
+    "LogUri": "s3://test/test",
+    "ReleaseLabel": "emr-5.30.0",
+    "ScaleDownBehavior": "TERMINATE_AT_TASK_COMPLETION",
+    "Instances": {
+        "Ec2KeyName": "test-key-name",
+        "Ec2SubnetId": "subnet-0a0dsafaaa499d58e",
+        "EmrManagedSlaveSecurityGroup": "sg-02a2342d3136bfedd",
+        "EmrManagedMasterSecurityGroup": "sg-0ee2414f2d0842a19",
+        "InstanceGroups": [{
+                "Name": "Master nodes",
+                "Market": "ON_DEMAND",
+                "InstanceRole": "MASTER",
+                "InstanceType": "r5.4xlarge",
+                "InstanceCount": 1
+            },
+            {
+                "Name": "Slave nodes",
+                "Market": "ON_DEMAND",
+                "InstanceRole": "CORE",
+                "InstanceType": "r5.4xlarge",
+                "InstanceCount": 1
+            }
+        ],
+        "TerminationProtected": false,
+        "KeepJobFlowAliveWhenNoSteps": true
+    },
+    "Applications": [{
+            "Name": "Hadoop"
+        },
+        {
+            "Name": "Spark"
+        }
+    ],
+    "BootstrapActions": [{
+        "Name": "Bootstrap EMR Cluster",
+        "ScriptBootstrapAction": {
+            "Path": "s3://test/test.sh"
+        }
+    }],
+    "VisibleToAllUsers": true,
+    "JobFlowRole": "EMR_EC2_DefaultRole",
+    "ServiceRole": "EMR_DefaultRole",
+    "Tags": [{
+            "Key": "app",
+            "Value": "analytics"
+        },
+        {
+            "Key": "environment",
+            "Value": "development"
+        }
+    ],
+    "Configurations": [
+    {
+      "Classification": "spark-defaults",
+      "Properties": {
+        "spark.executor.cores": "3",
+        "spark.driver.cores": "5",
+        "spark.driver.extraJavaOptions": "-XX:+UseParallelGC -XX:+UseParallelOldGC",
+        "spark.executor.extraJavaOptions": "-XX:+UseParallelGC -XX:+UseParallelOldGC"
+      }
+    }
+  ]
+}

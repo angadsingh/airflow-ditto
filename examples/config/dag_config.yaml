@@ -1,0 +1,15 @@
+emr:
+  aws_conn_id: aws_default
+  emr_conn_id: emr_default
+  hadoop_jar_path: s3://psm-poc-dmp-temp/spark-examples.jar
+  emr_cluster_id: PiCalc
+hdi:
+  azure_conn_id: azure_hdi_default
+  hdi_conn_id: azure_hdi_cluster_params_default
+  wasb_conn_id: wasb_default
+  adls_conn_id: azure_data_lake_default
+  hadoop_jar_path: wasb:///example/jars/spark-examples.jar
+  bucket_name: hdi
+  bucket_key: /foo/*
+  dist_cp_src: wasbs://hdi/foo/bar
+  dist_cp_target: wasbs://hdi/foo_bar
