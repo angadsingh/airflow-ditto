@@ -8,7 +8,16 @@ At the heart, Ditto is a graph manipulation library, which extendable APIs for t
 
 The reason behind creation of Ditto at Trufactor is well documented [here](https://inmobi-my.sharepoint.com/:w:/r/personal/angad_singh_inmobi_com/_layouts/15/Doc.aspx?sourcedoc=%7B8FA897AD-82BC-5054-B2A0-AB2910B58CA8%7D&file=Proposal_%20Airflow%20operator%20abstraction%20for%20a%20multi-cloud%20environment.docx&action=default&mobileredirect=true&cid=2df10ccd-f32c-4a15-95e3-9b52a2c5b03d)
 
-###### A quick example
+TOC
+ - [Examples](#a-quick-example)
+ + [Concepts](#concepts)
+   - [Transformers](#transformers)
+   - [Resolvers](#resolvers)
+   - [SubDag Transformers and Matchers](#subdag-transformers-and-matchers)
+   - [Templates](#templates)
+ - [Built-in implementations](#built-in-implementations)
+
+#### A quick example
 
 Ditto is created for conveniently transforming a large number of DAGs which follow a similar pattern quickly. Here's how easy it is to use Ditto:
 
@@ -37,7 +46,7 @@ You can put the above call in any python file which is visible to airflow and th
 
 ![simple_dag_hdi](README.assets/simple_dag_hdi.png)
 
-###### A more complex example
+#### A more complex example
 
 This is how you can transform any EMR operator based DAG to an HDInsight operator based DAG (using operators from the [airflow-hdinsight](https://gitlab.pinsightmedia.com/telco-dmp/airflow-hdinsight) project)
 
@@ -80,9 +89,9 @@ There's a lot happening here, but the above example uses (almost) all capabiliti
 
 ![Figure_2](README.assets/complex_dag_hdi.png)
 
-#### Concepts
+### Concepts
 
-##### `Transformers`
+#### Transformers
 
 At the bottom of the abstraction hierarchy of Ditto's API are `Transformers`.  These are the basic nuts and bolts of the system. These are called from Ditto's core during a transformation to convert the source DAG's operators to the target DAG's operators. There are two types of `Transformers`: `OperatorTransformer` and `SubDagTransformer`. We'll talk about the former first, as the latter requires munching up a few more concepts to understand. An example `OperatorTransformer` could look like this:
 
@@ -136,7 +145,7 @@ As you can see this returns an entire sub-DAG instead of just one target operato
 
 This is a core part of how Ditto works: it allows transformers to *talk to each other* while tranforming a DAG. Look at the `EmrStepSensorTransformer` or `EmrAddStepsOperatorTransformer` to see how this works.
 
-##### `Resolvers`
+#### Resolvers
 
 Ok, so you made a bunch of cool transformers. But how would Ditto know which one to use for which source operator? That's where `Resolvers` come in. As you can see in the examples given at the beginning, when you initialize ditto's core (`ditto.AirflowDagTransformer`), you give it a bunch of resolvers to use. When traversing the source graph, it asks each resolvers to *resolve a transformer for that source task*. It then uses that `Transformer` to transform that source task. Ditto provides the following `Resolvers` out of the box, but you can write your own:
 
@@ -144,10 +153,12 @@ Ok, so you made a bunch of cool transformers. But how would Ditto know which one
 * `AncestralClassTransformerResolver`: find transformer based on all the ancestor classes of the source task's python class
 * `PythonCallTransformerResolver`: match a transformer with an operator if its a `PythonOperator` and it's `python_callable` is calling a specified python method inside. It uses runtime source code parsing to achieve this. This comes handy when you want to transform custom `PythonOperator`s or `BranchPythonOperator`s in the source DAG and match on them.
 
-##### `SubDag Transformers` and `Matchers`
+#### SubDag Transformers and Matchers
 
 This is where Ditto gets serious, if it did not appear so already. Suppose you want to transform entire sub-DAGs of the source DAG and replace them with your own subgraph of operators, and not just match on individual tasks. This is where `SubDagTransformer`s come in. This is best explained with an example
-##### ![check_cluster_emr_dag](README.assets/check_cluster_emr_dag.png)
+
+![check_cluster_emr_dag](README.assets/check_cluster_emr_dag.png)
+
 In this DAG, there's a pattern we want to match and replace:
 
 ```python
@@ -192,7 +203,7 @@ Here's a more complex example, where the matching sub-DAG is `[Matcher(op2,op6),
 ![complex_subdag_transformer_target_dag](README.assets/complex_subdag_transformer_target_dag.png)
 
 
-##### `Templates`
+#### Templates
 
 Templates are nothing but a configuration of `OperatorTransformers`, `Resolvers`, `SubDagTransformers` and their `Matchers` stitched together with some defaults. You can then reuse templates to transform several DAGs at different places. Templates bring it all together for you to use Ditto conveniently.
 
