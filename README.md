@@ -8,14 +8,15 @@ At the heart, Ditto is a graph manipulation library, which extendable APIs for t
 
 The reason behind creation of Ditto at Trufactor is well documented [here](https://inmobi-my.sharepoint.com/:w:/r/personal/angad_singh_inmobi_com/_layouts/15/Doc.aspx?sourcedoc=%7B8FA897AD-82BC-5054-B2A0-AB2910B58CA8%7D&file=Proposal_%20Airflow%20operator%20abstraction%20for%20a%20multi-cloud%20environment.docx&action=default&mobileredirect=true&cid=2df10ccd-f32c-4a15-95e3-9b52a2c5b03d)
 
-TOC
- - [Examples](#a-quick-example)
- + [Concepts](#concepts)
-   - [Transformers](#transformers)
-   - [Resolvers](#resolvers)
-   - [SubDag Transformers and Matchers](#subdag-transformers-and-matchers)
-   - [Templates](#templates)
- - [Built-in implementations](#built-in-implementations)
+#### TOC
+
+* [Examples](#a-quick-example)
+* [Concepts](#concepts)
+  * [Transformers](#transformers)
+  * [Resolvers](#resolvers)
+  * [SubDag Transformers and Matchers](#subdag-transformers-and-matchers)
+  * [Templates](#templates)
+* [Built-in implementations](#built-in-implementations)
 
 #### A quick example
 
