@@ -8,7 +8,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='airflow-ditto',
-    version='0.0.1',
+    version='0.0.1.2',
     author="Angad Singh",
     author_email="angad.singh@trufactor.io",
     description="An airflow DAG transformation framework",
