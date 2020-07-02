@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_namespace_packages
 
 # read the contents of your README file
 from os import path
@@ -16,7 +16,7 @@ setup(
     long_description_content_type='text/markdown',
     license="Apache Software License (http://www.apache.org/licenses/LICENSE-2.0)",
     url="https://github.com/angadsingh/airflow-ditto",
-    py_modules=['ditto'],
+    packages = find_namespace_packages(include=["ditto.*"]),
     install_requires=[
         'azure-mgmt-hdinsight~=1.5.1',
         'msrestazure~=0.6.3',
