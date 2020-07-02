@@ -5,4 +5,17 @@ python:
   - "3.8"
 install:
   - python3 setup.py install
-script: python3 -m unittest discover -s tests -v
+  - pip3 install -r docs/requirements
+script:
+  - python3 -m unittest discover -s tests -v
+  - cd docs/
+  - make html
+  - cd -
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+  local_dir: docs/_build/html
+  keep_history: true
+  on:
+    branch: master
