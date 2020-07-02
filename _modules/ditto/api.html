@@ -1,0 +1,568 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ditto.api &mdash; airflow-ditto 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/sphinx_paramlinks.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> airflow-ditto
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.api.html">ditto.api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.ditto.html">ditto.ditto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.rendering.html">ditto.rendering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.utils.html">ditto.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.matchers.html">ditto.matchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.resolvers.html">ditto.resolvers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.templates.html">ditto.templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.transformers.html">ditto.transformers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">airflow-ditto</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>ditto.api</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ditto.api</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">ABC</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Generic</span>
+
+<span class="kn">from</span> <span class="nn">airflow</span> <span class="kn">import</span> <span class="n">DAG</span>
+<span class="kn">from</span> <span class="nn">airflow.models</span> <span class="kn">import</span> <span class="n">BaseOperator</span>
+
+
+<div class="viewcode-block" id="DAGFragment"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.DAGFragment">[docs]</a><span class="k">class</span> <span class="nc">DAGFragment</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A DAG fragment represents a sub-DAG of a DAG. It is meant to be able to</span>
+<span class="sd">        represent fragments of operator subDAGs which are not yet attached to an</span>
+<span class="sd">        airflow DAG. DAGFragments can also be part of its own fragment DAG using</span>
+<span class="sd">        the ``parents`` and ``children`` references. Operator references are used</span>
+<span class="sd">        to traverse the fragment&#39;s subDAG and parent/children references are used</span>
+<span class="sd">        to traverse the DAG of fragments themselves if needed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tasks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseOperator</span><span class="p">],</span> <span class="n">parents</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;DAGFragment&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">children</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s1">&#39;DAGFragment&#39;</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param tasks: root tasks of the fragment (operator references are used to</span>
+<span class="sd">            traverse the operator subDAG)</span>
+<span class="sd">        :param parents: parent fragments</span>
+<span class="sd">        :param children: child fragments</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseOperator</span><span class="p">]</span> <span class="o">=</span> <span class="n">tasks</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">parents</span><span class="p">:</span>
+            <span class="n">parents</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parents</span> <span class="o">=</span> <span class="n">parents</span>  <span class="c1"># type: List[DAGFragment]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">children</span><span class="p">:</span>
+            <span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">children</span> <span class="c1"># type: List[DAGFragment]</span>
+
+<div class="viewcode-block" id="DAGFragment.add_parent"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.DAGFragment.add_parent">[docs]</a>    <span class="k">def</span> <span class="nf">add_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dag_fragment</span><span class="p">:</span> <span class="s1">&#39;DAGFragment&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        set a parent-child relationship between this `DAGFragment` and another</span>
+
+<span class="sd">        :param dag_fragment: the other `DAGFragment`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dag_fragment</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dag_fragment</span><span class="p">)</span>
+            <span class="n">dag_fragment</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DAGFragment.add_child"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.DAGFragment.add_child">[docs]</a>    <span class="k">def</span> <span class="nf">add_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dag_fragment</span><span class="p">:</span> <span class="s1">&#39;DAGFragment&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        set a child-parent relationship between this `DAGFragment` and another</span>
+
+<span class="sd">        :param dag_fragment: the other `DAGFragment`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dag_fragment</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dag_fragment</span><span class="p">)</span>
+            <span class="n">dag_fragment</span><span class="o">.</span><span class="n">add_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DAGFragment.add_child_in_place"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.DAGFragment.add_child_in_place">[docs]</a>    <span class="k">def</span> <span class="nf">add_child_in_place</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add an operator as a child `DAGFragment` at the place</span>
+<span class="sd">        in the `DAGFragment` dag where it belonged in this fragment&#39;s</span>
+<span class="sd">        operator DAG</span>
+
+<span class="sd">        :param child: the operator to add in place</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">frag_q</span><span class="p">:</span> <span class="s2">&quot;deque[DAGFragment]&quot;</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="n">frag_q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">frag_q</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">frag</span> <span class="o">=</span> <span class="n">frag_q</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">frag</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">task</span><span class="o">.</span><span class="n">downstream_list</span><span class="p">:</span>
+                    <span class="n">frag</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">DAGFragment</span><span class="p">([</span><span class="n">child</span><span class="p">]))</span>
+
+            <span class="k">if</span> <span class="n">frag</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">child_frag</span> <span class="ow">in</span> <span class="n">frag</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                    <span class="n">frag_q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child_frag</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TransformerDefaults"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.TransformerDefaults">[docs]</a><span class="k">class</span> <span class="nc">TransformerDefaults</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Used to hold configuration for a :class:`~ditto.api.OperatorTransformer`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_operator</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">,</span> <span class="n">other_defaults</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1">#: default output operator of this transformer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_operator</span> <span class="o">=</span> <span class="n">default_operator</span>
+
+        <span class="c1">#: any other defaults or conf you might want to set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">other_defaults</span> <span class="o">=</span> <span class="n">other_defaults</span></div>
+
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">BaseOperator</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Transformer"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.Transformer">[docs]</a><span class="k">class</span> <span class="nc">Transformer</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for all kinds of ditto transformers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: this header is added as a param to the transformed airflow operator</span>
+    <span class="c1">#: and can be used to find transformed operators in a target DAG</span>
+    <span class="n">TRANSFORMED_BY_HEADER</span> <span class="o">=</span> <span class="s1">&#39;__transformed_by&#39;</span></div>
+
+
+<div class="viewcode-block" id="OperatorTransformer"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.OperatorTransformer">[docs]</a><span class="k">class</span> <span class="nc">OperatorTransformer</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">Transformer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A type of :class:`~ditto.api.Transformer` which can transform individual airflow operators</span>
+<span class="sd">    This is an abstract class which your operator transformers need to subclass, where `T`</span>
+<span class="sd">    is the source operator type being transformed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_dag</span><span class="p">:</span> <span class="n">DAG</span><span class="p">,</span> <span class="n">defaults</span><span class="p">:</span> <span class="n">TransformerDefaults</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param target_dag: the target to which the transformed operators must be added</span>
+<span class="sd">        :param defaults: the default configuration for this transformer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dag</span> <span class="o">=</span> <span class="n">target_dag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span> <span class="o">=</span> <span class="n">defaults</span> <span class="k">if</span> <span class="n">defaults</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> \
+            <span class="n">TransformerDefaults</span><span class="p">(</span><span class="n">default_operator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">other_defaults</span><span class="o">=</span><span class="p">{})</span>
+
+<div class="viewcode-block" id="OperatorTransformer.transform"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.OperatorTransformer.transform">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_operator</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">,</span> <span class="n">parent_fragment</span><span class="p">:</span> <span class="n">DAGFragment</span><span class="p">,</span> <span class="n">upstream_fragments</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DAGFragment</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DAGFragment</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The main method to implement for an `OperatorTransformer`</span>
+
+<span class="sd">        :param src_operator: The source operator to be tranformed</span>
+<span class="sd">        :param parent_fragment: This will give you a linked-list of parent :class:`~ditto.api.DAGFragment`\&#39;s, uptil the root</span>
+<span class="sd">            The transform operation can make use of the upstream parent chain, for example, to obtain information</span>
+<span class="sd">            about the upstream transformations. A good example of this is an add-step operator transformation</span>
+<span class="sd">            which needs to get the cluster ID from an upstream transformed create-cluster operator</span>
+<span class="sd">        :param upstream_fragments: This will give you *all* the upstream :class:`~ditto.api.DAGFragment`\&#39;s transformed so far</span>
+<span class="sd">            in level-order, from the root till this node in the source DAG. This is just a more exhaustive version of</span>
+<span class="sd">            `parent_fragment`, and can give you parent&#39;s siblings, etc.</span>
+<span class="sd">        :return: the :class:`~ditto.api.DAGFragment` of transformed airflow :class:`operators &lt;airflow.models.BaseOperator&gt;`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="OperatorTransformer.copy_op_attrs"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.OperatorTransformer.copy_op_attrs">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">copy_op_attrs</span><span class="p">(</span><span class="n">to_op</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">,</span> <span class="n">from_op</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseOperator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A utility method to copy all the attributes of a source operator</span>
+<span class="sd">        to the transformed operator after transformation. Does not copy</span>
+<span class="sd">        attributes which need to be unique like task_id or dag_id, and that</span>
+<span class="sd">        have to be set by the transformer itself</span>
+
+<span class="sd">        :param to_op: the target operator to copy the attrs to</span>
+<span class="sd">        :param from_op: the source operator to copy the attrs from</span>
+<span class="sd">        :return: the to_op</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">owner</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">owner</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">owner</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">owner</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">email</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">email</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">email</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">email_on_retry</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">email_on_retry</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">email_on_retry</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">email_on_retry</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">email_on_failure</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">email_on_failure</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">email_on_failure</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">email_on_failure</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">retries</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">retries</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">retries</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">retries</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">retry_delay</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">retry_delay</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">retry_delay</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">retry_delay</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">retry_exponential_backoff</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">retry_exponential_backoff</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">retry_exponential_backoff</span> <span class="k">else</span>  <span class="n">to_op</span><span class="o">.</span><span class="n">retry_exponential_backoff</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">max_retry_delay</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">max_retry_delay</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">max_retry_delay</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">max_retry_delay</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">start_date</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">start_date</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">start_date</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">start_date</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">end_date</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">end_date</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">end_date</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">end_date</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">depends_on_past</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">depends_on_past</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">depends_on_past</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">depends_on_past</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">wait_for_downstream</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">wait_for_downstream</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">wait_for_downstream</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">wait_for_downstream</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">priority_weight</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">priority_weight</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">priority_weight</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">priority_weight</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">weight_rule</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">weight_rule</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">weight_rule</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">weight_rule</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">queue</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">queue</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">queue</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">pool</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">pool</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">pool</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">pool_slots</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">pool_slots</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">pool_slots</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">pool</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">sla</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">sla</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">sla</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">sla</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">execution_timeout</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">execution_timeout</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">execution_timeout</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">execution_timeout</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">on_failure_callback</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">on_failure_callback</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">on_failure_callback</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">on_failure_callback</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">on_success_callback</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">on_success_callback</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">on_success_callback</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">on_success_callback</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">on_retry_callback</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">on_retry_callback</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">on_retry_callback</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">on_retry_callback</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">trigger_rule</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">trigger_rule</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">trigger_rule</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">trigger_rule</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">resources</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">resources</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">resources</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">resources</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">run_as_user</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">run_as_user</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">run_as_user</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">run_as_user</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">task_concurrency</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">task_concurrency</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">task_concurrency</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">task_concurrency</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">executor_config</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">executor_config</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">executor_config</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">executor_config</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">do_xcom_push</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">do_xcom_push</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">do_xcom_push</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">do_xcom_push</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">inlets</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">inlets</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">inlets</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">inlets</span>
+        <span class="n">to_op</span><span class="o">.</span><span class="n">outlets</span> <span class="o">=</span> <span class="n">from_op</span><span class="o">.</span><span class="n">outlets</span> <span class="k">if</span> <span class="n">from_op</span><span class="o">.</span><span class="n">outlets</span> <span class="k">else</span> <span class="n">to_op</span><span class="o">.</span><span class="n">outlets</span>
+
+        <span class="k">return</span> <span class="n">to_op</span></div>
+
+<div class="viewcode-block" id="OperatorTransformer.get_default_op"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.OperatorTransformer.get_default_op">[docs]</a>    <span class="k">def</span> <span class="nf">get_default_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_operator</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseOperator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A utility method to deep copy a :paramref:`~ditto.api.TransformerDefaults.default_operator`</span>
+<span class="sd">        in the :class:`~ditto.api.TransformerDefaults` of this transformer</span>
+
+<span class="sd">        :param src_operator: the source operator from which attrs need to be copied</span>
+<span class="sd">        :return: the deep copied operator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="o">.</span><span class="n">default_operator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">new_op</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="o">.</span><span class="n">default_operator</span><span class="p">)</span>
+                <span class="n">new_op</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="n">src_operator</span><span class="o">.</span><span class="n">task_id</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_op_attrs</span><span class="p">(</span><span class="n">new_op</span><span class="p">,</span> <span class="n">src_operator</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OperatorTransformer.sign_op"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.OperatorTransformer.sign_op">[docs]</a>    <span class="k">def</span> <span class="nf">sign_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_op</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds the :const:`~ditto.api.Transformer.TRANSFORMED_BY_HEADER` header</span>
+<span class="sd">        as a param to the `output_op`</span>
+
+<span class="sd">        :param output_op: the op to which the header has to be added</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output_op</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">Transformer</span><span class="o">.</span><span class="n">TRANSFORMED_BY_HEADER</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span></div></div>
+
+
+<div class="viewcode-block" id="TransformerResolver"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.TransformerResolver">[docs]</a><span class="k">class</span> <span class="nc">TransformerResolver</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The abstract base class to define ditto resolvers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TransformerResolver.resolve_transformer"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.TransformerResolver.resolve_transformer">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">resolve_transformer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">OperatorTransformer</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The main method to be implemented by a resolver</span>
+
+<span class="sd">        :param task: the source task for which a transformer has to be resolved (found)</span>
+<span class="sd">        :return: the type of :class:`~ditto.api.OperatorTransformer` found for this :class:`~airflow.models.BaseOperator`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="TransformerException"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.TransformerException">[docs]</a><span class="k">class</span> <span class="nc">TransformerException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exceptions thrown by ditto transformers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="UpstreamOperatorNotFoundException"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.UpstreamOperatorNotFoundException">[docs]</a><span class="k">class</span> <span class="nc">UpstreamOperatorNotFoundException</span><span class="p">(</span><span class="n">TransformerException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A type of :class:`~ditto.api.TransformerException` thrown</span>
+<span class="sd">    when an operator is not found upstream of this operator</span>
+<span class="sd">    to be transformed and was required.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">upstream_op</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">,</span> <span class="n">transformer_op</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">):</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot transform operator </span><span class="si">{</span><span class="n">transformer_op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;without a </span><span class="si">{</span><span class="n">upstream_op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> defined upstream. &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;Make sure you have connections between operators configured properly.&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TransformerException</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TransformerDefaultsConf"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.TransformerDefaultsConf">[docs]</a><span class="k">class</span> <span class="nc">TransformerDefaultsConf</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">defaults</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Transformer</span><span class="p">],</span> <span class="n">TransformerDefaults</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span> <span class="o">=</span> <span class="n">defaults</span></div>
+
+
+<div class="viewcode-block" id="TaskMatcher"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.TaskMatcher">[docs]</a><span class="k">class</span> <span class="nc">TaskMatcher</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The abstract base class used to define task matchers.</span>
+<span class="sd">    Task matchers are used to fingerprint and match operators based on certain</span>
+<span class="sd">    qualifying criteria. They fit in ditto&#39;s workflow for subdag transformation</span>
+<span class="sd">    where a subdag of TaskMatchers is found in the source airflow DAG</span>
+<span class="sd">    TaskMatchers can be linked to each other to form a DAG using its ``parents``</span>
+<span class="sd">    and ``children`` attributes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#: parent matchers of this matcher</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parents</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1">#: child matchers of this matcher</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="TaskMatcher.set_downstream"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.TaskMatcher.set_downstream">[docs]</a>    <span class="k">def</span> <span class="nf">set_downstream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        add the `other` matcher to this matcher&#39;s children</span>
+
+<span class="sd">        :param other: the other matcher</span>
+<span class="sd">        :return: self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">parents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TaskMatcher.set_upstream"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.TaskMatcher.set_upstream">[docs]</a>    <span class="k">def</span> <span class="nf">set_upstream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        add the `other` matcher to this matcher&#39;s parents</span>
+
+<span class="sd">        :param other: the other matcher</span>
+<span class="sd">        :return: self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements Self &gt;&gt; Other == self.set_downstream(other)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">other</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_downstream</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_downstream</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">other</span>
+
+    <span class="k">def</span> <span class="fm">__lshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements Self &lt;&lt; Other == self.set_upstream(other)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">other</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_upstream</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_upstream</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">other</span>
+
+    <span class="k">def</span> <span class="fm">__rrshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__lshift__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__rlshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__rshift__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="TaskMatcher.does_match"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.TaskMatcher.does_match">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">does_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        the main method to implement, containing logic to match</span>
+<span class="sd">        the provided operator with the matcher&#39;s criteria</span>
+
+<span class="sd">        :param task: the operator to try to match</span>
+<span class="sd">        :return: `True` if matched otherwise `False`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="SubDagTransformer"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.SubDagTransformer">[docs]</a><span class="k">class</span> <span class="nc">SubDagTransformer</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">Transformer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The abstract base class to implement to define ditto SubDagTransformers</span>
+
+<span class="sd">    SubDag transformers are meant to, as their name goes, match subdags of operators</span>
+<span class="sd">    in the source airflow DAG, and then transform and replace them with a new subdag</span>
+<span class="sd">    as per the :class:`~ditto.api.DAGFragment`\&#39;s returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dag</span><span class="p">:</span> <span class="n">DAG</span><span class="p">,</span> <span class="n">defaults</span><span class="p">:</span> <span class="n">TransformerDefaults</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param dag: the source dag where subdags are to be found</span>
+<span class="sd">        :param defaults: the default configuration for this subdag transformer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dag</span> <span class="o">=</span> <span class="n">dag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span> <span class="o">=</span> <span class="n">defaults</span> <span class="k">if</span> <span class="n">defaults</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> \
+            <span class="n">TransformerDefaults</span><span class="p">(</span><span class="n">default_operator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">other_defaults</span><span class="o">=</span><span class="p">{})</span>
+
+<div class="viewcode-block" id="SubDagTransformer.get_sub_dag_matcher"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.SubDagTransformer.get_sub_dag_matcher">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_sub_dag_matcher</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">TaskMatcher</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implement this method to construct and return a DAG of matchers for ditto to</span>
+<span class="sd">        then try to use and find a subdag in the source airflow DAG</span>
+
+<span class="sd">        :return: list of root nodes of the :class:`~ditto.api.TaskMatcher` DAG</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="SubDagTransformer.transform"><a class="viewcode-back" href="../../source/ditto.api.html#ditto.api.SubDagTransformer.transform">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subdag</span><span class="p">:</span> <span class="n">DAGFragment</span><span class="p">,</span> <span class="n">parent_fragment</span><span class="p">:</span> <span class="n">DAGFragment</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DAGFragment</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implement this method to do the actual transformation of the subdag found using</span>
+<span class="sd">        the matchers returned by :meth:`.get_sub_dag_matcher`</span>
+
+<span class="sd">        :param subdag: :class:`~ditto.api.DAGFragment` representing subdag of source DAG operators matched</span>
+<span class="sd">        :param parent_fragment: This will give you a linked-list of parent :class:`~ditto.api.DAGFragment`\&#39;s,</span>
+<span class="sd">            uptil the root. See :paramref:`~ditto.api.OperatorTransformer.transform.parent_fragment`.</span>
+<span class="sd">        :return: the :class:`~ditto.api.DAGFragment` of transformed airflow :class:`operators &lt;airflow.models.BaseOperator&gt;`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Angad Singh
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

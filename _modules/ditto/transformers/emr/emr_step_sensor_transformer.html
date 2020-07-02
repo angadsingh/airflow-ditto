@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ditto.transformers.emr.emr_step_sensor_transformer &mdash; airflow-ditto 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sphinx_paramlinks.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home" alt="Documentation Home"> airflow-ditto
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.api.html">ditto.api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.ditto.html">ditto.ditto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.rendering.html">ditto.rendering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.utils.html">ditto.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.matchers.html">ditto.matchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.resolvers.html">ditto.resolvers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.templates.html">ditto.templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.transformers.html">ditto.transformers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">airflow-ditto</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>ditto.transformers.emr.emr_step_sensor_transformer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ditto.transformers.emr.emr_step_sensor_transformer</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">airflow</span> <span class="kn">import</span> <span class="n">DAG</span>
+<span class="kn">from</span> <span class="nn">airflow.contrib.sensors.emr_step_sensor</span> <span class="kn">import</span> <span class="n">EmrStepSensor</span>
+<span class="kn">from</span> <span class="nn">airflow.models</span> <span class="kn">import</span> <span class="n">BaseOperator</span>
+<span class="kn">from</span> <span class="nn">airflow.operators.dummy_operator</span> <span class="kn">import</span> <span class="n">DummyOperator</span>
+
+<span class="kn">from</span> <span class="nn">ditto.api</span> <span class="kn">import</span> <span class="n">OperatorTransformer</span><span class="p">,</span> <span class="n">TransformerDefaults</span><span class="p">,</span> <span class="n">DAGFragment</span><span class="p">,</span> <span class="n">UpstreamOperatorNotFoundException</span>
+<span class="kn">from</span> <span class="nn">ditto.utils</span> <span class="kn">import</span> <span class="n">TransformerUtils</span>
+<span class="kn">from</span> <span class="nn">ditto.transformers.emr</span> <span class="kn">import</span> <span class="n">EmrAddStepsOperatorTransformer</span>
+<span class="kn">from</span> <span class="nn">airflowhdi.operators</span> <span class="kn">import</span> <span class="n">ConnectedAzureHDInsightCreateClusterOperator</span>
+<span class="kn">from</span> <span class="nn">airflowhdi.operators</span> <span class="kn">import</span> <span class="n">LivyBatchOperator</span>
+<span class="kn">from</span> <span class="nn">airflowhdi.sensors.livy_batch_sensor</span> <span class="kn">import</span> <span class="n">LivyBatchSensor</span>
+
+
+<div class="viewcode-block" id="EmrStepSensorTransformer"><a class="viewcode-back" href="../../../../source/transformers/emr/ditto.transformers.emr.EmrStepSensorTransformer.html#ditto.transformers.emr.EmrStepSensorTransformer">[docs]</a><span class="k">class</span> <span class="nc">EmrStepSensorTransformer</span><span class="p">(</span><span class="n">OperatorTransformer</span><span class="p">[</span><span class="n">EmrStepSensor</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transforms the sensor :class:`~airflow.contrib.operators.emr_step_sensor.EmrStepSensor`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_dag</span><span class="p">:</span> <span class="n">DAG</span><span class="p">,</span> <span class="n">defaults</span><span class="p">:</span> <span class="n">TransformerDefaults</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target_dag</span><span class="p">,</span> <span class="n">defaults</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EmrStepSensorTransformer.transform"><a class="viewcode-back" href="../../../../source/transformers/emr/ditto.transformers.emr.EmrStepSensorTransformer.html#ditto.transformers.emr.EmrStepSensorTransformer.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_operator</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">,</span> <span class="n">parent_fragment</span><span class="p">:</span> <span class="n">DAGFragment</span><span class="p">,</span> <span class="n">upstream_fragments</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DAGFragment</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DAGFragment</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This transformer assumes and relies on the fact that an upstream transformation</span>
+<span class="sd">        of a :class:`~airflow.contrib.operators.emr_create_job_flow_operator.EmrCreateJobFlowOperator`</span>
+<span class="sd">        has already taken place, since it needs to find the output of that transformation</span>
+<span class="sd">        to get the `cluster_name` and `azure_conn_id` from that operator (which should have been a</span>
+<span class="sd">        :class:`~airflowhdi.operators.AzureHDInsightCreateClusterOperator`)</span>
+
+<span class="sd">        This transformer also requires than there would already be transformations of</span>
+<span class="sd">        :class:`~airflow.contrib.operators.emr_add_steps_operator.EmrAddStepsOperator` to</span>
+<span class="sd">        :class:`~airflowhdi.operators.LivyBatchOperator` or :class:`~airflowhdi.operators.AzureHDInsightSshOperator`</span>
+<span class="sd">        in the `upstream_fragments` which can then be monitored by the output tasks of</span>
+<span class="sd">        this transformer. It needs to search for those ops upstream to find their task IDs</span>
+
+<span class="sd">        Adds :class:`~airflowhdi.sensors.LivyBatchSensor` if it was a livy spark job.</span>
+<span class="sd">        There&#39;s no sensor required for a transformed :class:`~airflowhdi.operators.AzureHDInsightSshOperator`</span>
+<span class="sd">        as it is synchronous.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">create_op_task_id</span> <span class="o">=</span> <span class="n">TransformerUtils</span><span class="o">.</span><span class="n">get_task_id_from_xcom_pull</span><span class="p">(</span><span class="n">src_operator</span><span class="o">.</span><span class="n">job_flow_id</span><span class="p">)</span>
+        <span class="n">create_op</span><span class="p">:</span> <span class="n">BaseOperator</span> <span class="o">=</span> \
+            <span class="n">TransformerUtils</span><span class="o">.</span><span class="n">find_op_in_fragment_list</span><span class="p">(</span>
+                <span class="n">upstream_fragments</span><span class="p">,</span>
+                <span class="n">operator_type</span><span class="o">=</span><span class="n">ConnectedAzureHDInsightCreateClusterOperator</span><span class="p">,</span>
+                <span class="n">task_id</span><span class="o">=</span><span class="n">create_op_task_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">create_op</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UpstreamOperatorNotFoundException</span><span class="p">(</span><span class="n">ConnectedAzureHDInsightCreateClusterOperator</span><span class="p">,</span>
+                                                    <span class="n">EmrStepSensor</span><span class="p">)</span>
+
+        <span class="n">emr_step_sensor_op</span><span class="p">:</span> <span class="n">EmrStepSensor</span> <span class="o">=</span> <span class="n">src_operator</span>
+
+        <span class="n">emr_add_step_task_id</span> <span class="o">=</span> <span class="n">TransformerUtils</span><span class="o">.</span><span class="n">get_task_id_from_xcom_pull</span><span class="p">(</span><span class="n">emr_step_sensor_op</span><span class="o">.</span><span class="n">step_id</span><span class="p">)</span>
+        <span class="n">emr_add_step_step_id</span> <span class="o">=</span> <span class="n">TransformerUtils</span><span class="o">.</span><span class="n">get_list_index_from_xcom_pull</span><span class="p">(</span><span class="n">emr_step_sensor_op</span><span class="o">.</span><span class="n">step_id</span><span class="p">)</span>
+        <span class="n">target_step_task_id</span> <span class="o">=</span> <span class="n">EmrAddStepsOperatorTransformer</span><span class="o">.</span><span class="n">get_target_step_task_id</span><span class="p">(</span><span class="n">emr_add_step_task_id</span><span class="p">,</span> <span class="n">emr_add_step_step_id</span><span class="p">)</span>
+
+        <span class="n">add_step_op</span><span class="p">:</span> <span class="n">BaseOperator</span> <span class="o">=</span> \
+            <span class="n">TransformerUtils</span><span class="o">.</span><span class="n">find_op_in_fragment_list_strict</span><span class="p">(</span>
+                <span class="n">upstream_fragments</span><span class="p">,</span>
+                <span class="n">task_id</span><span class="o">=</span><span class="n">target_step_task_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">add_step_op</span><span class="p">,</span> <span class="n">LivyBatchOperator</span><span class="p">):</span>
+            <span class="n">step_sensor_op</span> <span class="o">=</span> <span class="n">LivyBatchSensor</span><span class="p">(</span>
+                <span class="n">batch_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">{{{{</span><span class="s2"> task_instance.xcom_pull(&#39;</span><span class="si">{</span><span class="n">target_step_task_id</span><span class="si">}</span><span class="s2">&#39;, key=&#39;return_value&#39;) </span><span class="se">}}}}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">task_id</span> <span class="o">=</span> <span class="n">emr_step_sensor_op</span><span class="o">.</span><span class="n">task_id</span><span class="p">,</span>
+                <span class="n">azure_conn_id</span><span class="o">=</span><span class="n">create_op</span><span class="o">.</span><span class="n">azure_conn_id</span><span class="p">,</span>
+                <span class="n">cluster_name</span><span class="o">=</span><span class="n">create_op</span><span class="o">.</span><span class="n">cluster_name</span><span class="p">,</span>
+                <span class="n">verify_in</span><span class="o">=</span><span class="s2">&quot;yarn&quot;</span><span class="p">,</span>
+                <span class="n">dag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dag</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># don&#39;t need a sensor for the ssh operator</span>
+            <span class="n">step_sensor_op</span> <span class="o">=</span> <span class="n">DummyOperator</span><span class="p">(</span><span class="n">task_id</span><span class="o">=</span><span class="n">emr_step_sensor_op</span><span class="o">.</span><span class="n">task_id</span><span class="p">,</span> <span class="n">dag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dag</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">copy_op_attrs</span><span class="p">(</span><span class="n">step_sensor_op</span><span class="p">,</span> <span class="n">emr_step_sensor_op</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sign_op</span><span class="p">(</span><span class="n">step_sensor_op</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">DAGFragment</span><span class="p">([</span><span class="n">step_sensor_op</span><span class="p">])</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Angad Singh
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

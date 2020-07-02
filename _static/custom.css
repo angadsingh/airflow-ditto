@@ -1,0 +1,7 @@
+.wy-nav-content {
+    max-width: 800px !important;
+}
+
+.rst-content code.xref, .rst-content tt.xref, a .rst-content code, a .rst-content tt {
+    color: #e74c3c;
+}

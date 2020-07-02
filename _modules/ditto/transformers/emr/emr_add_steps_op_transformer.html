@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ditto.transformers.emr.emr_add_steps_op_transformer &mdash; airflow-ditto 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/sphinx_paramlinks.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home" alt="Documentation Home"> airflow-ditto
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.api.html">ditto.api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.ditto.html">ditto.ditto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.rendering.html">ditto.rendering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.utils.html">ditto.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.matchers.html">ditto.matchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.resolvers.html">ditto.resolvers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.templates.html">ditto.templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/ditto.transformers.html">ditto.transformers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">airflow-ditto</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>ditto.transformers.emr.emr_add_steps_op_transformer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ditto.transformers.emr.emr_add_steps_op_transformer</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">airflow</span> <span class="kn">import</span> <span class="n">DAG</span>
+<span class="kn">from</span> <span class="nn">airflow.contrib.operators.emr_add_steps_operator</span> <span class="kn">import</span> <span class="n">EmrAddStepsOperator</span>
+<span class="kn">from</span> <span class="nn">airflow.models</span> <span class="kn">import</span> <span class="n">BaseOperator</span>
+<span class="kn">from</span> <span class="nn">airflow.operators.dummy_operator</span> <span class="kn">import</span> <span class="n">DummyOperator</span>
+<span class="kn">from</span> <span class="nn">airflow.utils.trigger_rule</span> <span class="kn">import</span> <span class="n">TriggerRule</span>
+
+<span class="kn">from</span> <span class="nn">ditto.api</span> <span class="kn">import</span> <span class="n">OperatorTransformer</span><span class="p">,</span> <span class="n">TransformerDefaults</span><span class="p">,</span> <span class="n">DAGFragment</span><span class="p">,</span> <span class="n">UpstreamOperatorNotFoundException</span>
+<span class="kn">from</span> <span class="nn">ditto.utils</span> <span class="kn">import</span> <span class="n">TransformerUtils</span>
+<span class="kn">from</span> <span class="nn">airflowhdi.operators.azure_hdinsight_create_cluster_operator</span> <span class="kn">import</span> <span class="n">ConnectedAzureHDInsightCreateClusterOperator</span>
+<span class="kn">from</span> <span class="nn">airflowhdi.operators.azure_hdinsight_ssh_operator</span> <span class="kn">import</span> <span class="n">AzureHDInsightSshOperator</span>
+<span class="kn">from</span> <span class="nn">airflowhdi.operators</span> <span class="kn">import</span> <span class="n">LivyBatchOperator</span>
+
+
+<div class="viewcode-block" id="EmrAddStepsOperatorTransformer"><a class="viewcode-back" href="../../../../source/transformers/emr/ditto.transformers.emr.EmrAddStepsOperatorTransformer.html#ditto.transformers.emr.EmrAddStepsOperatorTransformer">[docs]</a><span class="k">class</span> <span class="nc">EmrAddStepsOperatorTransformer</span><span class="p">(</span><span class="n">OperatorTransformer</span><span class="p">[</span><span class="n">EmrAddStepsOperator</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transforms the operator :class:`~airflow.contrib.operators.emr_add_steps_operator.EmrAddStepsOperator`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: default livy proxy user</span>
+    <span class="n">DEFAULT_PROXY_USER</span> <span class="o">=</span> <span class="s2">&quot;admin&quot;</span>
+
+    <span class="c1">#: default spark configuration to use</span>
+    <span class="n">DEFAULT_SPARK_CONF</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;spark.shuffle.compress&#39;</span><span class="p">:</span> <span class="s1">&#39;false&#39;</span><span class="p">}</span>
+
+    <span class="c1">#: number of mappers to use in case its a distcp</span>
+    <span class="n">HADOOP_DISTCP_DEFAULT_MAPPERS</span> <span class="o">=</span> <span class="mi">100</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_dag</span><span class="p">:</span> <span class="n">DAG</span><span class="p">,</span> <span class="n">defaults</span><span class="p">:</span> <span class="n">TransformerDefaults</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target_dag</span><span class="p">,</span> <span class="n">defaults</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proxy_user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="o">.</span><span class="n">other_defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;proxy_user&#39;</span><span class="p">,</span> <span class="n">EmrAddStepsOperatorTransformer</span><span class="o">.</span><span class="n">DEFAULT_PROXY_USER</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spark_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="o">.</span><span class="n">other_defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;spark_conf&#39;</span><span class="p">,</span> <span class="n">EmrAddStepsOperatorTransformer</span><span class="o">.</span><span class="n">DEFAULT_SPARK_CONF</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EmrAddStepsOperatorTransformer.get_target_step_task_id"><a class="viewcode-back" href="../../../../source/transformers/emr/ditto.transformers.emr.EmrAddStepsOperatorTransformer.html#ditto.transformers.emr.EmrAddStepsOperatorTransformer.get_target_step_task_id">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_target_step_task_id</span><span class="p">(</span><span class="n">add_step_task_id</span><span class="p">,</span> <span class="n">add_step_step_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        generates a task_id for the transformed output operators</span>
+<span class="sd">        for each input EMR step</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">add_step_task_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">add_step_step_id</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+<div class="viewcode-block" id="EmrAddStepsOperatorTransformer.transform"><a class="viewcode-back" href="../../../../source/transformers/emr/ditto.transformers.emr.EmrAddStepsOperatorTransformer.html#ditto.transformers.emr.EmrAddStepsOperatorTransformer.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_operator</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">,</span> <span class="n">parent_fragment</span><span class="p">:</span> <span class="n">DAGFragment</span><span class="p">,</span> <span class="n">upstream_fragments</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DAGFragment</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DAGFragment</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This transformer assumes and relies on the fact that an upstream transformation</span>
+<span class="sd">        of a :class:`~airflow.contrib.operators.emr_create_job_flow_operator.EmrCreateJobFlowOperator`</span>
+<span class="sd">        has already taken place, since it needs to find the output of that transformation</span>
+<span class="sd">        to get the `cluster_name` and `azure_conn_id` from that operator (which should have been a</span>
+<span class="sd">        :class:`~airflowhdi.operators.AzureHDInsightCreateClusterOperator`)</span>
+
+<span class="sd">        It then goes through the EMR steps of this :class:`~airflow.contrib.operators.emr_add_steps_operator.EmrAddStepsOperator`</span>
+<span class="sd">        and creates a :class:`~airflowhdi.operators.LivyBatchOperator` or an :class:`~airflowhdi.operators.AzureHDInsightSshOperator`</span>
+<span class="sd">        for each corresponding step, based on grokking the step&#39;s params and figuring out whether its a spark job being run</span>
+<span class="sd">        on an arbitrary hadoop command like `distcp`, `hdfs` or the like.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            This transformer creates multiple operators from a single source operator</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            The spark configuration for the livy spark job are derived from `step[&#39;HadoopJarStep&#39;][&#39;Properties&#39;]` of the EMR step,</span>
+<span class="sd">            or could even be specified at the cluster level itself when transforming the job flow</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">create_op_task_id</span> <span class="o">=</span> <span class="n">TransformerUtils</span><span class="o">.</span><span class="n">get_task_id_from_xcom_pull</span><span class="p">(</span><span class="n">src_operator</span><span class="o">.</span><span class="n">job_flow_id</span><span class="p">)</span>
+        <span class="n">create_op</span><span class="p">:</span> <span class="n">BaseOperator</span> <span class="o">=</span> \
+            <span class="n">TransformerUtils</span><span class="o">.</span><span class="n">find_op_in_fragment_list</span><span class="p">(</span>
+                <span class="n">upstream_fragments</span><span class="p">,</span>
+                <span class="n">operator_type</span><span class="o">=</span><span class="n">ConnectedAzureHDInsightCreateClusterOperator</span><span class="p">,</span>
+                <span class="n">task_id</span><span class="o">=</span><span class="n">create_op_task_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">create_op</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UpstreamOperatorNotFoundException</span><span class="p">(</span><span class="n">ConnectedAzureHDInsightCreateClusterOperator</span><span class="p">,</span>
+                                                    <span class="n">EmrAddStepsOperator</span><span class="p">)</span>
+
+        <span class="n">emr_add_steps_op</span><span class="p">:</span> <span class="n">EmrAddStepsOperator</span> <span class="o">=</span> <span class="n">src_operator</span>
+        <span class="n">dag_fragment_steps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">steps_added_op</span> <span class="o">=</span> <span class="n">DummyOperator</span><span class="p">(</span>
+            <span class="n">task_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">emr_add_steps_op</span><span class="o">.</span><span class="n">task_id</span><span class="si">}</span><span class="s2">_added&quot;</span><span class="p">,</span>
+            <span class="n">dag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sign_op</span><span class="p">(</span><span class="n">steps_added_op</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">emr_add_steps_op</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">step</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]</span>
+
+            <span class="n">ssh_command</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">livy_file</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">livy_arguments</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">livy_main_class</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="s1">&#39;command-runner&#39;</span> <span class="ow">in</span> <span class="n">step</span><span class="p">[</span><span class="s1">&#39;HadoopJarStep&#39;</span><span class="p">][</span><span class="s1">&#39;Jar&#39;</span><span class="p">]:</span>
+                <span class="n">command_runner_cmd</span> <span class="o">=</span> <span class="n">step</span><span class="p">[</span><span class="s1">&#39;HadoopJarStep&#39;</span><span class="p">][</span><span class="s1">&#39;Args&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s1">&#39;/usr/bin/spark-submit&#39;</span> <span class="ow">in</span> <span class="n">command_runner_cmd</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">livy_file</span> <span class="o">=</span> <span class="n">command_runner_cmd</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">livy_arguments</span> <span class="o">=</span> <span class="n">command_runner_cmd</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+                <span class="k">elif</span> <span class="s1">&#39;s3-dist-cp&#39;</span> <span class="ow">in</span> <span class="n">command_runner_cmd</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">src</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">dest</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">command_runner_cmd</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                        <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;--src=&#39;</span><span class="p">):</span>
+                            <span class="n">src</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;--src=&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;--dest=&#39;</span><span class="p">):</span>
+                            <span class="n">dest</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;--dest=&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">mappers</span> <span class="o">=</span> <span class="n">EmrAddStepsOperatorTransformer</span><span class="o">.</span><span class="n">HADOOP_DISTCP_DEFAULT_MAPPERS</span>
+                    <span class="n">ssh_command</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;hadoop distcp -m </span><span class="si">{</span><span class="n">mappers</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">dest</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">elif</span> <span class="s1">&#39;hdfs&#39;</span> <span class="ow">in</span> <span class="n">command_runner_cmd</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">ssh_command</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command_runner_cmd</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;This kind of step is not supported right now&quot;</span><span class="p">,</span> <span class="n">command_runner_cmd</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">livy_file</span> <span class="o">=</span> <span class="n">step</span><span class="p">[</span><span class="s1">&#39;HadoopJarStep&#39;</span><span class="p">][</span><span class="s1">&#39;Jar&#39;</span><span class="p">]</span>
+                <span class="n">livy_arguments</span> <span class="o">=</span> <span class="n">step</span><span class="p">[</span><span class="s1">&#39;HadoopJarStep&#39;</span><span class="p">][</span><span class="s1">&#39;Args&#39;</span><span class="p">]</span>
+                <span class="n">livy_main_class</span> <span class="o">=</span> <span class="n">step</span><span class="p">[</span><span class="s1">&#39;HadoopJarStep&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MainClass&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s1">&#39;Properties&#39;</span> <span class="ow">in</span> <span class="n">step</span><span class="p">[</span><span class="s1">&#39;HadoopJarStep&#39;</span><span class="p">]:</span>
+                <span class="n">properties</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">step</span><span class="p">[</span><span class="s1">&#39;HadoopJarStep&#39;</span><span class="p">][</span><span class="s1">&#39;Properties&#39;</span><span class="p">]:</span>
+                    <span class="n">properties</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;-D</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> &quot;</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">spark_conf</span><span class="p">[</span><span class="s1">&#39;spark.executor.extraJavaOptions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">properties</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">spark_conf</span><span class="p">[</span><span class="s1">&#39;spark.driver.extraJavaOptions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">properties</span>
+
+            <span class="n">target_step_task_id</span> <span class="o">=</span> <span class="n">EmrAddStepsOperatorTransformer</span><span class="o">.</span><span class="n">get_target_step_task_id</span><span class="p">(</span><span class="n">emr_add_steps_op</span><span class="o">.</span><span class="n">task_id</span><span class="p">,</span> <span class="n">emr_add_steps_op</span><span class="o">.</span><span class="n">steps</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">step</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">ssh_command</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">step_op</span> <span class="o">=</span> <span class="n">AzureHDInsightSshOperator</span><span class="p">(</span>
+                    <span class="n">cluster_name</span><span class="o">=</span><span class="n">create_op</span><span class="o">.</span><span class="n">cluster_name</span><span class="p">,</span>
+                    <span class="n">azure_conn_id</span><span class="o">=</span><span class="n">create_op</span><span class="o">.</span><span class="n">azure_conn_id</span><span class="p">,</span>
+                    <span class="n">command</span><span class="o">=</span><span class="n">ssh_command</span><span class="p">,</span>
+                    <span class="n">task_id</span><span class="o">=</span><span class="n">target_step_task_id</span><span class="p">,</span>
+                    <span class="n">dag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dag</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">step_op</span> <span class="o">=</span> <span class="n">LivyBatchOperator</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">file</span><span class="o">=</span><span class="n">livy_file</span><span class="p">,</span>
+                    <span class="n">arguments</span><span class="o">=</span><span class="n">livy_arguments</span><span class="p">,</span>
+                    <span class="n">class_name</span><span class="o">=</span><span class="n">livy_main_class</span><span class="p">,</span>
+                    <span class="n">azure_conn_id</span><span class="o">=</span><span class="n">create_op</span><span class="o">.</span><span class="n">azure_conn_id</span><span class="p">,</span>
+                    <span class="n">cluster_name</span><span class="o">=</span><span class="n">create_op</span><span class="o">.</span><span class="n">cluster_name</span><span class="p">,</span>
+                    <span class="n">proxy_user</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">proxy_user</span><span class="p">,</span>
+                    <span class="n">conf</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spark_conf</span><span class="p">,</span>
+                    <span class="n">task_id</span><span class="o">=</span><span class="n">target_step_task_id</span><span class="p">,</span>
+                    <span class="n">dag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dag</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">copy_op_attrs</span><span class="p">(</span><span class="n">step_op</span><span class="p">,</span> <span class="n">emr_add_steps_op</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sign_op</span><span class="p">(</span><span class="n">step_op</span><span class="p">)</span>
+            <span class="n">step_op</span><span class="o">.</span><span class="n">trigger_rule</span> <span class="o">=</span> <span class="n">TriggerRule</span><span class="o">.</span><span class="n">ALL_SUCCESS</span>
+
+            <span class="n">step_op</span><span class="o">.</span><span class="n">set_downstream</span><span class="p">(</span><span class="n">steps_added_op</span><span class="p">)</span>
+            <span class="n">dag_fragment_steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">step_op</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">DAGFragment</span><span class="p">(</span><span class="n">dag_fragment_steps</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Angad Singh
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

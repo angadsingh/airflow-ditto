@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ClassTransformerResolver &mdash; airflow-ditto 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/sphinx_paramlinks.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="AncestralClassTransformerResolver" href="ditto.resolvers.AncestralClassTransformerResolver.html" />
+    <link rel="prev" title="ditto.resolvers" href="../ditto.resolvers.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> airflow-ditto
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../ditto.api.html">ditto.api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ditto.ditto.html">ditto.ditto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ditto.rendering.html">ditto.rendering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ditto.utils.html">ditto.utils</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../ditto.matchers.html">ditto.matchers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../ditto.resolvers.html">ditto.resolvers</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ClassTransformerResolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ditto.resolvers.AncestralClassTransformerResolver.html">AncestralClassTransformerResolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ditto.resolvers.PythonCallTransformerResolver.html">PythonCallTransformerResolver</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ditto.templates.html">ditto.templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ditto.transformers.html">ditto.transformers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">airflow-ditto</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../ditto.resolvers.html">ditto.resolvers</a> &raquo;</li>
+        
+      <li>ClassTransformerResolver</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/source/resolvers/ditto.resolvers.ClassTransformerResolver.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="classtransformerresolver">
+<h1>ClassTransformerResolver<a class="headerlink" href="#classtransformerresolver" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="ditto.resolvers.ClassTransformerResolver">
+<em class="property">class </em><code class="sig-prename descclassname">ditto.resolvers.</code><code class="sig-name descname">ClassTransformerResolver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">operator_transformers</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ditto/resolvers/class_transformer_resolver.html#ClassTransformerResolver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.resolvers.ClassTransformerResolver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../ditto.api.html#ditto.api.TransformerResolver" title="ditto.api.TransformerResolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ditto.api.TransformerResolver</span></code></a></p>
+<p>Finds a resolver for a transformer based on the class of the source operator given</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="ditto.resolvers.ClassTransformerResolver.params.operator_transformers"></span><strong>operator_transformers</strong><a class="paramlink headerlink reference internal" href="#ditto.resolvers.ClassTransformerResolver.params.operator_transformers">¶</a> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="../ditto.api.html#ditto.api.OperatorTransformer" title="ditto.api.OperatorTransformer"><code class="xref py py-class docutils literal notranslate"><span class="pre">OperatorTransformer</span></code></a>]]) – a map of operator type and transformer type</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="ditto.resolvers.ClassTransformerResolver.get_transformer_for_class">
+<code class="sig-name descname">get_transformer_for_class</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task_cls</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ditto/resolvers/class_transformer_resolver.html#ClassTransformerResolver.get_transformer_for_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.resolvers.ClassTransformerResolver.get_transformer_for_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the transformer type for a given operator type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="ditto.resolvers.ClassTransformerResolver.get_transformer_for_class.params.task_cls"></span><strong>task_cls</strong><a class="paramlink headerlink reference internal" href="#ditto.resolvers.ClassTransformerResolver.get_transformer_for_class.params.task_cls">¶</a> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>) – the operator type (class)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="../ditto.api.html#ditto.api.OperatorTransformer" title="ditto.api.OperatorTransformer"><code class="xref py py-class docutils literal notranslate"><span class="pre">OperatorTransformer</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the transformer type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ditto.resolvers.ClassTransformerResolver.resolve_transformer">
+<code class="sig-name descname">resolve_transformer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ditto/resolvers/class_transformer_resolver.html#ClassTransformerResolver.resolve_transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.resolvers.ClassTransformerResolver.resolve_transformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The main method to be implemented by a resolver</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="ditto.resolvers.ClassTransformerResolver.resolve_transformer.params.task"></span><strong>task</strong><a class="paramlink headerlink reference internal" href="#ditto.resolvers.ClassTransformerResolver.resolve_transformer.params.task">¶</a> (<a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a>) – the source task for which a transformer has to be resolved (found)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="../ditto.api.html#ditto.api.OperatorTransformer" title="ditto.api.OperatorTransformer"><code class="xref py py-class docutils literal notranslate"><span class="pre">OperatorTransformer</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the type of <a class="reference internal" href="../ditto.api.html#ditto.api.OperatorTransformer" title="ditto.api.OperatorTransformer"><code class="xref py py-class docutils literal notranslate"><span class="pre">OperatorTransformer</span></code></a> found for this <a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/index.html#airflow.models.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ditto.resolvers.AncestralClassTransformerResolver.html" class="btn btn-neutral float-right" title="AncestralClassTransformerResolver" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../ditto.resolvers.html" class="btn btn-neutral float-left" title="ditto.resolvers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Angad Singh
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

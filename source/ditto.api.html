@@ -1,0 +1,580 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ditto.api &mdash; airflow-ditto 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ditto.ditto" href="ditto.ditto.html" />
+    <link rel="prev" title="Ditto" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> airflow-ditto
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ditto.api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ditto.ditto.html">ditto.ditto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ditto.rendering.html">ditto.rendering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ditto.utils.html">ditto.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ditto.matchers.html">ditto.matchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ditto.resolvers.html">ditto.resolvers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ditto.templates.html">ditto.templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ditto.transformers.html">ditto.transformers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">airflow-ditto</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>ditto.api</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/ditto.api.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ditto.api">
+<span id="ditto-api"></span><h1>ditto.api<a class="headerlink" href="#module-ditto.api" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="ditto.api.DAGFragment">
+<em class="property">class </em><code class="sig-prename descclassname">ditto.api.</code><code class="sig-name descname">DAGFragment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tasks</span></em>, <em class="sig-param"><span class="n">parents</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">children</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#DAGFragment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.DAGFragment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A DAG fragment represents a sub-DAG of a DAG. It is meant to be able to
+represent fragments of operator subDAGs which are not yet attached to an
+airflow DAG. DAGFragments can also be part of its own fragment DAG using
+the <code class="docutils literal notranslate"><span class="pre">parents</span></code> and <code class="docutils literal notranslate"><span class="pre">children</span></code> references. Operator references are used
+to traverse the fragment’s subDAG and parent/children references are used
+to traverse the DAG of fragments themselves if needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="ditto.api.DAGFragment.params.tasks"></span><strong>tasks</strong><a class="paramlink headerlink reference internal" href="#ditto.api.DAGFragment.params.tasks">¶</a> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a>]) – root tasks of the fragment (operator references are used to
+traverse the operator subDAG)</p></li>
+<li><p><span class="target" id="ditto.api.DAGFragment.params.parents"></span><strong>parents</strong><a class="paramlink headerlink reference internal" href="#ditto.api.DAGFragment.params.parents">¶</a> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a>]]) – parent fragments</p></li>
+<li><p><span class="target" id="ditto.api.DAGFragment.params.children"></span><strong>children</strong><a class="paramlink headerlink reference internal" href="#ditto.api.DAGFragment.params.children">¶</a> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a>]]) – child fragments</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="ditto.api.DAGFragment.add_parent">
+<code class="sig-name descname">add_parent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dag_fragment</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#DAGFragment.add_parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.DAGFragment.add_parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>set a parent-child relationship between this <cite>DAGFragment</cite> and another</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="ditto.api.DAGFragment.add_parent.params.dag_fragment"></span><strong>dag_fragment</strong><a class="paramlink headerlink reference internal" href="#ditto.api.DAGFragment.add_parent.params.dag_fragment">¶</a> (<a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a>) – the other <cite>DAGFragment</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ditto.api.DAGFragment.add_child">
+<code class="sig-name descname">add_child</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dag_fragment</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#DAGFragment.add_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.DAGFragment.add_child" title="Permalink to this definition">¶</a></dt>
+<dd><p>set a child-parent relationship between this <cite>DAGFragment</cite> and another</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="ditto.api.DAGFragment.add_child.params.dag_fragment"></span><strong>dag_fragment</strong><a class="paramlink headerlink reference internal" href="#ditto.api.DAGFragment.add_child.params.dag_fragment">¶</a> (<a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a>) – the other <cite>DAGFragment</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ditto.api.DAGFragment.add_child_in_place">
+<code class="sig-name descname">add_child_in_place</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">child</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#DAGFragment.add_child_in_place"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.DAGFragment.add_child_in_place" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an operator as a child <cite>DAGFragment</cite> at the place
+in the <cite>DAGFragment</cite> dag where it belonged in this fragment’s
+operator DAG</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="ditto.api.DAGFragment.add_child_in_place.params.child"></span><strong>child</strong><a class="paramlink headerlink reference internal" href="#ditto.api.DAGFragment.add_child_in_place.params.child">¶</a> (<a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a>) – the operator to add in place</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="ditto.api.TransformerDefaults">
+<em class="property">class </em><code class="sig-prename descclassname">ditto.api.</code><code class="sig-name descname">TransformerDefaults</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">default_operator</span></em>, <em class="sig-param"><span class="n">other_defaults</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#TransformerDefaults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.TransformerDefaults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Used to hold configuration for a <a class="reference internal" href="#ditto.api.OperatorTransformer" title="ditto.api.OperatorTransformer"><code class="xref py py-class docutils literal notranslate"><span class="pre">OperatorTransformer</span></code></a></p>
+<dl class="py attribute">
+<dt id="ditto.api.TransformerDefaults.default_operator">
+<code class="sig-name descname">default_operator</code><a class="headerlink" href="#ditto.api.TransformerDefaults.default_operator" title="Permalink to this definition">¶</a></dt>
+<dd><p>default output operator of this transformer</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ditto.api.TransformerDefaults.other_defaults">
+<code class="sig-name descname">other_defaults</code><a class="headerlink" href="#ditto.api.TransformerDefaults.other_defaults" title="Permalink to this definition">¶</a></dt>
+<dd><p>any other defaults or conf you might want to set</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="ditto.api.Transformer">
+<em class="property">class </em><code class="sig-prename descclassname">ditto.api.</code><code class="sig-name descname">Transformer</code><a class="reference internal" href="../_modules/ditto/api.html#Transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.Transformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for all kinds of ditto transformers</p>
+<dl class="py attribute">
+<dt id="ditto.api.Transformer.TRANSFORMED_BY_HEADER">
+<code class="sig-name descname">TRANSFORMED_BY_HEADER</code><em class="property"> = '__transformed_by'</em><a class="headerlink" href="#ditto.api.Transformer.TRANSFORMED_BY_HEADER" title="Permalink to this definition">¶</a></dt>
+<dd><p>this header is added as a param to the transformed airflow operator
+and can be used to find transformed operators in a target DAG</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="ditto.api.OperatorTransformer">
+<em class="property">class </em><code class="sig-prename descclassname">ditto.api.</code><code class="sig-name descname">OperatorTransformer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_dag</span></em>, <em class="sig-param"><span class="n">defaults</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#OperatorTransformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.OperatorTransformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Generic</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code>, <a class="reference internal" href="#ditto.api.Transformer" title="ditto.api.Transformer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ditto.api.Transformer</span></code></a></p>
+<p>A type of <a class="reference internal" href="#ditto.api.Transformer" title="ditto.api.Transformer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transformer</span></code></a> which can transform individual airflow operators
+This is an abstract class which your operator transformers need to subclass, where <cite>T</cite>
+is the source operator type being transformed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="ditto.api.OperatorTransformer.params.target_dag"></span><strong>target_dag</strong><a class="paramlink headerlink reference internal" href="#ditto.api.OperatorTransformer.params.target_dag">¶</a> (<a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/dag/index.html#airflow.models.dag.DAG" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAG</span></code></a>) – the target to which the transformed operators must be added</p></li>
+<li><p><span class="target" id="ditto.api.OperatorTransformer.params.defaults"></span><strong>defaults</strong><a class="paramlink headerlink reference internal" href="#ditto.api.OperatorTransformer.params.defaults">¶</a> (<a class="reference internal" href="#ditto.api.TransformerDefaults" title="ditto.api.TransformerDefaults"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransformerDefaults</span></code></a>) – the default configuration for this transformer</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="ditto.api.OperatorTransformer.transform">
+<em class="property">abstract </em><code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src_operator</span></em>, <em class="sig-param"><span class="n">parent_fragment</span></em>, <em class="sig-param"><span class="n">upstream_fragments</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#OperatorTransformer.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.OperatorTransformer.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>The main method to implement for an <cite>OperatorTransformer</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="ditto.api.OperatorTransformer.transform.params.src_operator"></span><strong>src_operator</strong><a class="paramlink headerlink reference internal" href="#ditto.api.OperatorTransformer.transform.params.src_operator">¶</a> (<a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a>) – The source operator to be tranformed</p></li>
+<li><p><span class="target" id="ditto.api.OperatorTransformer.transform.params.parent_fragment"></span><strong>parent_fragment</strong><a class="paramlink headerlink reference internal" href="#ditto.api.OperatorTransformer.transform.params.parent_fragment">¶</a> (<a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a>) – This will give you a linked-list of parent <a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a>’s, uptil the root
+The transform operation can make use of the upstream parent chain, for example, to obtain information
+about the upstream transformations. A good example of this is an add-step operator transformation
+which needs to get the cluster ID from an upstream transformed create-cluster operator</p></li>
+<li><p><span class="target" id="ditto.api.OperatorTransformer.transform.params.upstream_fragments"></span><strong>upstream_fragments</strong><a class="paramlink headerlink reference internal" href="#ditto.api.OperatorTransformer.transform.params.upstream_fragments">¶</a> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a>]) – This will give you <em>all</em> the upstream <a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a>’s transformed so far
+in level-order, from the root till this node in the source DAG. This is just a more exhaustive version of
+<cite>parent_fragment</cite>, and can give you parent’s siblings, etc.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the <a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a> of transformed airflow <a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/index.html#airflow.models.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">operators</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ditto.api.OperatorTransformer.copy_op_attrs">
+<em class="property">static </em><code class="sig-name descname">copy_op_attrs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">to_op</span></em>, <em class="sig-param"><span class="n">from_op</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#OperatorTransformer.copy_op_attrs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.OperatorTransformer.copy_op_attrs" title="Permalink to this definition">¶</a></dt>
+<dd><p>A utility method to copy all the attributes of a source operator
+to the transformed operator after transformation. Does not copy
+attributes which need to be unique like task_id or dag_id, and that
+have to be set by the transformer itself</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="ditto.api.OperatorTransformer.copy_op_attrs.params.to_op"></span><strong>to_op</strong><a class="paramlink headerlink reference internal" href="#ditto.api.OperatorTransformer.copy_op_attrs.params.to_op">¶</a> (<a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a>) – the target operator to copy the attrs to</p></li>
+<li><p><span class="target" id="ditto.api.OperatorTransformer.copy_op_attrs.params.from_op"></span><strong>from_op</strong><a class="paramlink headerlink reference internal" href="#ditto.api.OperatorTransformer.copy_op_attrs.params.from_op">¶</a> (<a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a>) – the source operator to copy the attrs from</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the to_op</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ditto.api.OperatorTransformer.get_default_op">
+<code class="sig-name descname">get_default_op</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src_operator</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#OperatorTransformer.get_default_op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.OperatorTransformer.get_default_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>A utility method to deep copy a <a class="reference internal" href="#ditto.api.TransformerDefaults.default_operator" title="ditto.api.TransformerDefaults.default_operator"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">default_operator</span></code></a>
+in the <a class="reference internal" href="#ditto.api.TransformerDefaults" title="ditto.api.TransformerDefaults"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransformerDefaults</span></code></a> of this transformer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="ditto.api.OperatorTransformer.get_default_op.params.src_operator"></span><strong>src_operator</strong><a class="paramlink headerlink reference internal" href="#ditto.api.OperatorTransformer.get_default_op.params.src_operator">¶</a> (<a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a>) – the source operator from which attrs need to be copied</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the deep copied operator</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ditto.api.OperatorTransformer.sign_op">
+<code class="sig-name descname">sign_op</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">output_op</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#OperatorTransformer.sign_op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.OperatorTransformer.sign_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the <a class="reference internal" href="#ditto.api.Transformer.TRANSFORMED_BY_HEADER" title="ditto.api.Transformer.TRANSFORMED_BY_HEADER"><code class="xref py py-const docutils literal notranslate"><span class="pre">TRANSFORMED_BY_HEADER</span></code></a> header
+as a param to the <cite>output_op</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="ditto.api.OperatorTransformer.sign_op.params.output_op"></span><strong>output_op</strong><a class="paramlink headerlink reference internal" href="#ditto.api.OperatorTransformer.sign_op.params.output_op">¶</a> (<a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a>) – the op to which the header has to be added</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="ditto.api.TransformerResolver">
+<em class="property">class </em><code class="sig-prename descclassname">ditto.api.</code><code class="sig-name descname">TransformerResolver</code><a class="reference internal" href="../_modules/ditto/api.html#TransformerResolver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.TransformerResolver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>The abstract base class to define ditto resolvers</p>
+<dl class="py method">
+<dt id="ditto.api.TransformerResolver.resolve_transformer">
+<em class="property">abstract </em><code class="sig-name descname">resolve_transformer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#TransformerResolver.resolve_transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.TransformerResolver.resolve_transformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The main method to be implemented by a resolver</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="ditto.api.TransformerResolver.resolve_transformer.params.task"></span><strong>task</strong><a class="paramlink headerlink reference internal" href="#ditto.api.TransformerResolver.resolve_transformer.params.task">¶</a> (<a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a>) – the source task for which a transformer has to be resolved (found)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<a class="reference internal" href="#ditto.api.OperatorTransformer" title="ditto.api.OperatorTransformer"><code class="xref py py-class docutils literal notranslate"><span class="pre">OperatorTransformer</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the type of <a class="reference internal" href="#ditto.api.OperatorTransformer" title="ditto.api.OperatorTransformer"><code class="xref py py-class docutils literal notranslate"><span class="pre">OperatorTransformer</span></code></a> found for this <a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/index.html#airflow.models.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="ditto.api.TransformerException">
+<em class="property">exception </em><code class="sig-prename descclassname">ditto.api.</code><code class="sig-name descname">TransformerException</code><a class="reference internal" href="../_modules/ditto/api.html#TransformerException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.TransformerException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exceptions thrown by ditto transformers</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="ditto.api.UpstreamOperatorNotFoundException">
+<em class="property">exception </em><code class="sig-prename descclassname">ditto.api.</code><code class="sig-name descname">UpstreamOperatorNotFoundException</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">upstream_op</span></em>, <em class="sig-param"><span class="n">transformer_op</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#UpstreamOperatorNotFoundException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.UpstreamOperatorNotFoundException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ditto.api.TransformerException" title="ditto.api.TransformerException"><code class="xref py py-class docutils literal notranslate"><span class="pre">ditto.api.TransformerException</span></code></a></p>
+<p>A type of <a class="reference internal" href="#ditto.api.TransformerException" title="ditto.api.TransformerException"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransformerException</span></code></a> thrown
+when an operator is not found upstream of this operator
+to be transformed and was required.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="ditto.api.TransformerDefaultsConf">
+<em class="property">class </em><code class="sig-prename descclassname">ditto.api.</code><code class="sig-name descname">TransformerDefaultsConf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">defaults</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#TransformerDefaultsConf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.TransformerDefaultsConf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="ditto.api.TaskMatcher">
+<em class="property">class </em><code class="sig-prename descclassname">ditto.api.</code><code class="sig-name descname">TaskMatcher</code><a class="reference internal" href="../_modules/ditto/api.html#TaskMatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.TaskMatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>The abstract base class used to define task matchers.
+Task matchers are used to fingerprint and match operators based on certain
+qualifying criteria. They fit in ditto’s workflow for subdag transformation
+where a subdag of TaskMatchers is found in the source airflow DAG
+TaskMatchers can be linked to each other to form a DAG using its <code class="docutils literal notranslate"><span class="pre">parents</span></code>
+and <code class="docutils literal notranslate"><span class="pre">children</span></code> attributes</p>
+<dl class="py attribute">
+<dt id="ditto.api.TaskMatcher.parents">
+<code class="sig-name descname">parents</code><a class="headerlink" href="#ditto.api.TaskMatcher.parents" title="Permalink to this definition">¶</a></dt>
+<dd><p>parent matchers of this matcher</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ditto.api.TaskMatcher.children">
+<code class="sig-name descname">children</code><a class="headerlink" href="#ditto.api.TaskMatcher.children" title="Permalink to this definition">¶</a></dt>
+<dd><p>child matchers of this matcher</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ditto.api.TaskMatcher.set_downstream">
+<code class="sig-name descname">set_downstream</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#TaskMatcher.set_downstream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.TaskMatcher.set_downstream" title="Permalink to this definition">¶</a></dt>
+<dd><p>add the <cite>other</cite> matcher to this matcher’s children</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="ditto.api.TaskMatcher.set_downstream.params.other"></span><strong>other</strong><a class="paramlink headerlink reference internal" href="#ditto.api.TaskMatcher.set_downstream.params.other">¶</a> – the other matcher</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ditto.api.TaskMatcher.set_upstream">
+<code class="sig-name descname">set_upstream</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#TaskMatcher.set_upstream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.TaskMatcher.set_upstream" title="Permalink to this definition">¶</a></dt>
+<dd><p>add the <cite>other</cite> matcher to this matcher’s parents</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="ditto.api.TaskMatcher.set_upstream.params.other"></span><strong>other</strong><a class="paramlink headerlink reference internal" href="#ditto.api.TaskMatcher.set_upstream.params.other">¶</a> – the other matcher</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ditto.api.TaskMatcher.does_match">
+<em class="property">abstract </em><code class="sig-name descname">does_match</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#TaskMatcher.does_match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.TaskMatcher.does_match" title="Permalink to this definition">¶</a></dt>
+<dd><p>the main method to implement, containing logic to match
+the provided operator with the matcher’s criteria</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="ditto.api.TaskMatcher.does_match.params.task"></span><strong>task</strong><a class="paramlink headerlink reference internal" href="#ditto.api.TaskMatcher.does_match.params.task">¶</a> (<a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/baseoperator/index.html#airflow.models.baseoperator.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code></a>) – the operator to try to match</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><cite>True</cite> if matched otherwise <cite>False</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="ditto.api.SubDagTransformer">
+<em class="property">class </em><code class="sig-prename descclassname">ditto.api.</code><code class="sig-name descname">SubDagTransformer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dag</span></em>, <em class="sig-param"><span class="n">defaults</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#SubDagTransformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.SubDagTransformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code>, <a class="reference internal" href="#ditto.api.Transformer" title="ditto.api.Transformer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ditto.api.Transformer</span></code></a></p>
+<p>The abstract base class to implement to define ditto SubDagTransformers</p>
+<p>SubDag transformers are meant to, as their name goes, match subdags of operators
+in the source airflow DAG, and then transform and replace them with a new subdag
+as per the <a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a>’s returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="ditto.api.SubDagTransformer.params.dag"></span><strong>dag</strong><a class="paramlink headerlink reference internal" href="#ditto.api.SubDagTransformer.params.dag">¶</a> (<a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/dag/index.html#airflow.models.dag.DAG" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAG</span></code></a>) – the source dag where subdags are to be found</p></li>
+<li><p><span class="target" id="ditto.api.SubDagTransformer.params.defaults"></span><strong>defaults</strong><a class="paramlink headerlink reference internal" href="#ditto.api.SubDagTransformer.params.defaults">¶</a> (<a class="reference internal" href="#ditto.api.TransformerDefaults" title="ditto.api.TransformerDefaults"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransformerDefaults</span></code></a>) – the default configuration for this subdag transformer</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="ditto.api.SubDagTransformer.get_sub_dag_matcher">
+<em class="property">abstract </em><code class="sig-name descname">get_sub_dag_matcher</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#SubDagTransformer.get_sub_dag_matcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.SubDagTransformer.get_sub_dag_matcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this method to construct and return a DAG of matchers for ditto to
+then try to use and find a subdag in the source airflow DAG</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#ditto.api.TaskMatcher" title="ditto.api.TaskMatcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">TaskMatcher</span></code></a>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of root nodes of the <a class="reference internal" href="#ditto.api.TaskMatcher" title="ditto.api.TaskMatcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">TaskMatcher</span></code></a> DAG</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ditto.api.SubDagTransformer.transform">
+<em class="property">abstract </em><code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">subdag</span></em>, <em class="sig-param"><span class="n">parent_fragment</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ditto/api.html#SubDagTransformer.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.api.SubDagTransformer.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this method to do the actual transformation of the subdag found using
+the matchers returned by <a class="reference internal" href="#ditto.api.SubDagTransformer.get_sub_dag_matcher" title="ditto.api.SubDagTransformer.get_sub_dag_matcher"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_sub_dag_matcher()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="ditto.api.SubDagTransformer.transform.params.subdag"></span><strong>subdag</strong><a class="paramlink headerlink reference internal" href="#ditto.api.SubDagTransformer.transform.params.subdag">¶</a> (<a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a>) – <a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a> representing subdag of source DAG operators matched</p></li>
+<li><p><span class="target" id="ditto.api.SubDagTransformer.transform.params.parent_fragment"></span><strong>parent_fragment</strong><a class="paramlink headerlink reference internal" href="#ditto.api.SubDagTransformer.transform.params.parent_fragment">¶</a> (<a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a>) – This will give you a linked-list of parent <a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a>’s,
+uptil the root. See <a class="reference internal" href="#ditto.api.OperatorTransformer.transform.params.parent_fragment" title="ditto.api.OperatorTransformer.transform"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">parent_fragment</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the <a class="reference internal" href="#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a> of transformed airflow <a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/index.html#airflow.models.BaseOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">operators</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ditto.ditto.html" class="btn btn-neutral float-right" title="ditto.ditto" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../index.html" class="btn btn-neutral float-left" title="Ditto" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Angad Singh
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

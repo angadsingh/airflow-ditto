@@ -1,0 +1,271 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>EmrTerminateJobFlowOperatorTransformer &mdash; airflow-ditto 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="ditto.transformers.s3" href="../../ditto.transformers.s3.html" />
+    <link rel="prev" title="EmrStepSensorTransformer" href="ditto.transformers.emr.EmrStepSensorTransformer.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> airflow-ditto
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ditto.api.html">ditto.api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ditto.ditto.html">ditto.ditto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ditto.rendering.html">ditto.rendering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ditto.utils.html">ditto.utils</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../ditto.matchers.html">ditto.matchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ditto.resolvers.html">ditto.resolvers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ditto.templates.html">ditto.templates</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../ditto.transformers.html">ditto.transformers</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../ditto.transformers.emr.html">ditto.transformers.emr</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ditto.transformers.emr.EmrAddStepsOperatorTransformer.html">EmrAddStepsOperatorTransformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ditto.transformers.emr.EmrCreateJobFlowOperatorTransformer.html">EmrCreateJobFlowOperatorTransformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ditto.transformers.emr.EmrJobFlowSensorTransformer.html">EmrJobFlowSensorTransformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ditto.transformers.emr.EmrStepSensorTransformer.html">EmrStepSensorTransformer</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">EmrTerminateJobFlowOperatorTransformer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../ditto.transformers.s3.html">ditto.transformers.s3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ditto.transformers.subdag.html">ditto.transformers.subdag</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">airflow-ditto</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../ditto.transformers.html">ditto.transformers</a> &raquo;</li>
+        
+          <li><a href="../../ditto.transformers.emr.html">ditto.transformers.emr</a> &raquo;</li>
+        
+      <li>EmrTerminateJobFlowOperatorTransformer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/source/transformers/emr/ditto.transformers.emr.EmrTerminateJobFlowOperatorTransformer.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="emrterminatejobflowoperatortransformer">
+<h1>EmrTerminateJobFlowOperatorTransformer<a class="headerlink" href="#emrterminatejobflowoperatortransformer" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="ditto.transformers.emr.EmrTerminateJobFlowOperatorTransformer">
+<em class="property">class </em><code class="sig-prename descclassname">ditto.transformers.emr.</code><code class="sig-name descname">EmrTerminateJobFlowOperatorTransformer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_dag</span></em>, <em class="sig-param"><span class="n">defaults</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/ditto/transformers/emr/emr_terminate_job_flow_op_transformer.html#EmrTerminateJobFlowOperatorTransformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.transformers.emr.EmrTerminateJobFlowOperatorTransformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../ditto.api.html#ditto.api.OperatorTransformer" title="ditto.api.OperatorTransformer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ditto.api.OperatorTransformer</span></code></a></p>
+<p>Transforms the operator <a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/contrib/operators/emr_terminate_job_flow_operator/index.html#airflow.contrib.operators.emr_terminate_job_flow_operator.EmrTerminateJobFlowOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmrTerminateJobFlowOperator</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="ditto.transformers.emr.EmrTerminateJobFlowOperatorTransformer.params.target_dag"></span><strong>target_dag</strong><a class="paramlink headerlink reference internal" href="#ditto.transformers.emr.EmrTerminateJobFlowOperatorTransformer.params.target_dag">¶</a> (<a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/models/dag/index.html#airflow.models.dag.DAG" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAG</span></code></a>) – the target to which the transformed operators must be added</p></li>
+<li><p><span class="target" id="ditto.transformers.emr.EmrTerminateJobFlowOperatorTransformer.params.defaults"></span><strong>defaults</strong><a class="paramlink headerlink reference internal" href="#ditto.transformers.emr.EmrTerminateJobFlowOperatorTransformer.params.defaults">¶</a> (<a class="reference internal" href="../../ditto.api.html#ditto.api.TransformerDefaults" title="ditto.api.TransformerDefaults"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransformerDefaults</span></code></a>) – the default configuration for this transformer</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="ditto.transformers.emr.EmrTerminateJobFlowOperatorTransformer.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src_operator</span></em>, <em class="sig-param"><span class="n">parent_fragment</span></em>, <em class="sig-param"><span class="n">upstream_fragments</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/ditto/transformers/emr/emr_terminate_job_flow_op_transformer.html#EmrTerminateJobFlowOperatorTransformer.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ditto.transformers.emr.EmrTerminateJobFlowOperatorTransformer.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>This transformer assumes and relies on the fact that an upstream transformation
+of a <a class="reference external" href="https://airflow.apache.org/docs/stable/_api/airflow/contrib/operators/emr_create_job_flow_operator/index.html#airflow.contrib.operators.emr_create_job_flow_operator.EmrCreateJobFlowOperator" title="(in Airflow v1.10.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmrCreateJobFlowOperator</span></code></a>
+has already taken place, since it needs to find the output of that transformation
+to get the <cite>cluster_name</cite> and <cite>azure_conn_id</cite> from that operator (which should have been a
+<a class="reference external" href="https://airflow-hdinsight.readthedocs.io/en/latest/source/airflowhdi.operators.html#airflowhdi.operators.AzureHDInsightCreateClusterOperator" title="(in airflow-hdinsight)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AzureHDInsightCreateClusterOperator</span></code></a>)</p>
+<p>Creates a <a class="reference external" href="https://airflow-hdinsight.readthedocs.io/en/latest/source/airflowhdi.operators.html#airflowhdi.operators.AzureHDInsightDeleteClusterOperator" title="(in airflow-hdinsight)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AzureHDInsightDeleteClusterOperator</span></code></a> to terminate
+the cluster</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../ditto.api.html#ditto.api.DAGFragment" title="ditto.api.DAGFragment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAGFragment</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../ditto.transformers.s3.html" class="btn btn-neutral float-right" title="ditto.transformers.s3" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ditto.transformers.emr.EmrStepSensorTransformer.html" class="btn btn-neutral float-left" title="EmrStepSensorTransformer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Angad Singh
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

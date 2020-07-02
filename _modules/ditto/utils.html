@@ -1,0 +1,594 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ditto.utils &mdash; airflow-ditto 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/sphinx_paramlinks.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> airflow-ditto
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.api.html">ditto.api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.ditto.html">ditto.ditto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.rendering.html">ditto.rendering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.utils.html">ditto.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.matchers.html">ditto.matchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.resolvers.html">ditto.resolvers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.templates.html">ditto.templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.transformers.html">ditto.transformers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">airflow-ditto</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>ditto.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ditto.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Type</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">from</span> <span class="nn">airflow</span> <span class="kn">import</span> <span class="n">DAG</span>
+<span class="kn">from</span> <span class="nn">airflow.models</span> <span class="kn">import</span> <span class="n">BaseOperator</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+
+<span class="kn">from</span> <span class="nn">ditto.api</span> <span class="kn">import</span> <span class="n">TaskMatcher</span><span class="p">,</span> <span class="n">DAGFragment</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">queue</span> <span class="kn">import</span> <span class="n">Queue</span>
+
+
+<div class="viewcode-block" id="TransformerUtils"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils">[docs]</a><span class="k">class</span> <span class="nc">TransformerUtils</span><span class="p">:</span>
+
+<div class="viewcode-block" id="TransformerUtils.get_list_index_from_xcom_pull"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils.get_list_index_from_xcom_pull">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_list_index_from_xcom_pull</span><span class="p">(</span><span class="n">xcom_template</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses an airflow template variable and finds the list index accessed</span>
+<span class="sd">        from the return value of an :meth:`~airflow.models.TaskInstance.xcom_pull`</span>
+
+<span class="sd">        :Example:</span>
+
+<span class="sd">        &gt;&gt;&gt; task_instance.xcom_pull(&quot;add_steps_to_cluster&quot;, key=&quot;return_value&quot;)[3]</span>
+<span class="sd">            will return &quot;3&quot;</span>
+<span class="sd">        &gt;&gt;&gt; {{ ti.xcom_pull(&quot;add_steps_to_cluster&quot;, key=&quot;return_value&quot;)[2] }}</span>
+<span class="sd">            will return &quot;2&quot;</span>
+
+<span class="sd">        :param xcom_template: airflow template string to parse</span>
+<span class="sd">        :return: the list index accessed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;\[(\d+)\]&quot;</span><span class="p">,</span> <span class="n">xcom_template</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TransformerUtils.get_task_id_from_xcom_pull"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils.get_task_id_from_xcom_pull">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_task_id_from_xcom_pull</span><span class="p">(</span><span class="n">xcom_template</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses an airflow template variable and finds the task ID</span>
+<span class="sd">        from which an :meth:`~airflow.models.TaskInstance.xcom_pull` is being done</span>
+
+<span class="sd">        :Example:</span>
+
+<span class="sd">        &gt;&gt;&gt; {{ ti.xcom_pull(&quot;add_steps_to_cluster&quot;, key=&quot;return_value&quot;)[0] }}</span>
+<span class="sd">            will return &quot;add_steps_to_cluster&quot;</span>
+<span class="sd">        &gt;&gt;&gt; {{ task_instance.xcom_pull(task_ids=&#39;add_steps&#39;, key=&#39;return_value&#39;)[0] }}</span>
+<span class="sd">            will return &quot;add_steps&quot;</span>
+
+<span class="sd">        :param xcom_template: airflow template string to parse</span>
+<span class="sd">        :return: the task_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;{{.*xcom_pull\s*\(.*[</span><span class="se">\&quot;</span><span class="s2">|</span><span class="se">\&#39;</span><span class="s2">](.*)[</span><span class="se">\&quot;</span><span class="s2">|</span><span class="se">\&#39;</span><span class="s2">],.*}}&quot;</span><span class="p">,</span> <span class="n">xcom_template</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TransformerUtils.add_downstream_dag_fragment"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils.add_downstream_dag_fragment">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">add_downstream_dag_fragment</span><span class="p">(</span><span class="n">fragment_up</span><span class="p">:</span> <span class="n">DAGFragment</span><span class="p">,</span> <span class="n">fragment_down</span><span class="p">:</span> <span class="n">DAGFragment</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attaches the roots of the `fragment_down` to the leaves of `fragment_up`,</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            The leaves of `fragment_up` are found by traversing its operator DAG, not</span>
+<span class="sd">            its :class:`~ditto.api.DAGFragment` dag. This does not join fragment DAGS but</span>
+<span class="sd">            only operator DAGS in two :class:`~ditto.api.DAGFragment`\&#39;s</span>
+
+<span class="sd">            See the documentation of :class:`~ditto.api.DAGFragment` for understanding</span>
+<span class="sd">            what that means.</span>
+
+<span class="sd">        :param fragment_up: the upstream :class:`~ditto.api.DAGFragment` to which `fragment_down`</span>
+<span class="sd">            has to be added</span>
+<span class="sd">        :param fragment_down: the downstream :class:`~ditto.api.DAGFragment`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">downstream_task_q</span><span class="p">:</span> <span class="s2">&quot;Queue[BaseOperator]&quot;</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="n">seen_tasks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">fragment_up</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">fragment_down</span>
+
+        <span class="k">if</span> <span class="n">fragment_down</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">fragment_up</span>
+
+        <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">fragment_up</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span>
+            <span class="n">downstream_task_q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+
+        <span class="c1"># add fragment_down.root_steps to the leaves of fragment_up</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">downstream_task_q</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">downstream_task_q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">downstream_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">downstream_task</span> <span class="ow">in</span> <span class="n">task</span><span class="o">.</span><span class="n">downstream_list</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">downstream_task</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_tasks</span><span class="p">:</span>
+                        <span class="n">downstream_task_q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">downstream_task</span><span class="p">)</span>
+                        <span class="n">seen_tasks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">downstream_task</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">task</span><span class="o">.</span><span class="n">set_downstream</span><span class="p">(</span><span class="n">fragment_down</span><span class="o">.</span><span class="n">tasks</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fragment_up</span></div>
+
+<div class="viewcode-block" id="TransformerUtils.find_op_in_parent_fragment_chain"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils.find_op_in_parent_fragment_chain">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">find_op_in_parent_fragment_chain</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parent_fragment</span><span class="p">:</span> <span class="n">DAGFragment</span><span class="p">,</span>
+                                         <span class="n">operator_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BaseOperator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                         <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseOperator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds the operator matched by the `operator_type` class and having task ID `task_id`</span>
+<span class="sd">        in the passed linked-list referenced by the `parent_fragment` :class:`~ditto.api.DAGFragment`</span>
+
+<span class="sd">        Uses the :meth:`~ditto.utils.TransformerUtils.find_op_in_dag_fragment` for understanding</span>
+<span class="sd">        how the search is done.</span>
+
+<span class="sd">        :param parent_fragment: See :paramref:`~ditto.api.OperatorTransformer.transform.parent_fragment`</span>
+<span class="sd">        :param operator_type: the type of operator to find</span>
+<span class="sd">        :param task_id: the task_id of the operator to find</span>
+<span class="sd">        :return: the operator found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">op_found</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">fragment_q</span><span class="p">:</span> <span class="s2">&quot;Queue[DAGFragment]&quot;</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="n">fragment_q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">parent_fragment</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">fragment_q</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+            <span class="n">dag_fragment</span> <span class="o">=</span> <span class="n">fragment_q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="n">op_found</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">find_op_in_dag_fragment</span><span class="p">(</span><span class="n">dag_fragment</span><span class="p">,</span>
+                            <span class="n">operator_type</span><span class="o">=</span><span class="n">operator_type</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">op_found</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">op_found</span>
+            <span class="k">for</span> <span class="n">parent</span> <span class="ow">in</span> <span class="n">dag_fragment</span><span class="o">.</span><span class="n">parents</span><span class="p">:</span>
+                <span class="n">fragment_q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TransformerUtils.find_op_in_fragment_list"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils.find_op_in_fragment_list">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">find_op_in_fragment_list</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fragment_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DAGFragment</span><span class="p">],</span>
+                                 <span class="n">operator_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BaseOperator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseOperator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lenient version of :meth:`~ditto.utils.TransformerUtils.find_op_in_fragment_list_strict`</span>
+
+<span class="sd">        :param fragment_list: the list of :class:`~ditto.api.DAGFragment`\&#39;s to search in</span>
+<span class="sd">        :param operator_type: the type of operator to find</span>
+<span class="sd">        :param task_id: the task_id of the operator to find</span>
+<span class="sd">        :return: the operator found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">found_op</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">find_op_in_fragment_list_strict</span><span class="p">(</span><span class="n">fragment_list</span><span class="p">,</span>
+                                                      <span class="n">operator_type</span><span class="o">=</span><span class="n">operator_type</span><span class="p">,</span>
+                                                      <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found_op</span><span class="p">:</span>
+            <span class="n">found_op</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">find_op_in_fragment_list_strict</span><span class="p">(</span><span class="n">fragment_list</span><span class="p">,</span>
+                                                      <span class="n">operator_type</span><span class="o">=</span><span class="n">operator_type</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">found_op</span></div>
+
+<div class="viewcode-block" id="TransformerUtils.find_op_in_fragment_list_strict"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils.find_op_in_fragment_list_strict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">find_op_in_fragment_list_strict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fragment_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DAGFragment</span><span class="p">],</span>
+                                        <span class="n">operator_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BaseOperator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseOperator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Uses :meth:`~ditto.utils.TransformerUtils.find_op_in_dag_fragment` to find</span>
+<span class="sd">        an operator in a list of :class:`~ditto.api.DAGFragment`\&#39;s</span>
+
+<span class="sd">        :param fragment_list: the list of :class:`~ditto.api.DAGFragment`\&#39;s to search in</span>
+<span class="sd">        :param operator_type: the type of operator to find</span>
+<span class="sd">        :param task_id: the task_id of the operator to find</span>
+<span class="sd">        :return: the operator found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">fragment_list</span><span class="p">:</span>
+            <span class="n">op_found</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">find_op_in_dag_fragment</span><span class="p">(</span><span class="n">fragment</span><span class="p">,</span>
+                            <span class="n">operator_type</span><span class="o">=</span><span class="n">operator_type</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">op_found</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">op_found</span></div>
+
+<div class="viewcode-block" id="TransformerUtils.find_op_in_dag_fragment"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils.find_op_in_dag_fragment">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">find_op_in_dag_fragment</span><span class="p">(</span><span class="n">dag_fragment</span><span class="p">:</span> <span class="n">DAGFragment</span><span class="p">,</span>
+                               <span class="n">operator_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BaseOperator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                               <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                               <span class="n">upstream</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseOperator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Traverses the operator dag of the given :class:`~ditto.api.DAGFragment`</span>
+<span class="sd">        and finds a :class:`~airflow.models.BaseOperator` matching the given `operator_type`</span>
+<span class="sd">        and `task_id`. First matches using the `operator_type` and subsequently using the</span>
+<span class="sd">        `task_id`. Can search upstream or downstream of the tasks in the given</span>
+<span class="sd">        :class:`~ditto.api.DAGFragment`</span>
+
+<span class="sd">        :param dag_fragment: fragment whose operator dag has to be searched</span>
+<span class="sd">        :param operator_type: the type of operator to find</span>
+<span class="sd">        :param task_id: the task_id of the operator to find</span>
+<span class="sd">        :param upstream: search upstream if `True` otherwise search `downstream`</span>
+<span class="sd">        :return: the operator found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">task_q</span><span class="p">:</span> <span class="s2">&quot;Queue[BaseOperator]&quot;</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="n">seen_tasks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">dag_fragment</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span>
+            <span class="n">task_q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">task_q</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">task_q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="n">found_task</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">operator_type</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">operator_type</span><span class="p">):</span>
+                    <span class="n">found_task</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">task_id</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">task_id</span> <span class="o">==</span> <span class="n">task_id</span><span class="p">:</span>
+                    <span class="n">found_task</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">found_task</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">found_task</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">task</span>
+
+            <span class="n">relative_task_list</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">downstream_list</span>
+            <span class="k">if</span> <span class="n">upstream</span> <span class="ow">and</span> <span class="n">task</span><span class="o">.</span><span class="n">upstream_list</span><span class="p">:</span>
+                <span class="n">relative_task_list</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">upstream_list</span>
+
+            <span class="k">if</span> <span class="n">relative_task_list</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">relative_task</span> <span class="ow">in</span> <span class="n">relative_task_list</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">relative_task</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_tasks</span><span class="p">:</span>
+                        <span class="n">task_q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">relative_task</span><span class="p">)</span>
+                        <span class="n">seen_tasks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">relative_task</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TransformerUtils.get_digraph_from_airflow_dag"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils.get_digraph_from_airflow_dag">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_digraph_from_airflow_dag</span><span class="p">(</span><span class="n">dag</span><span class="p">:</span> <span class="n">DAG</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct a :class:`~networkx.DiGraph` from the given airflow :class:`~airflow.models.DAG`</span>
+
+<span class="sd">        :param dag: the airflow DAG</span>
+<span class="sd">        :return: the networkx DiGraph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dg</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">OrderedDiGraph</span><span class="p">()</span>
+        <span class="n">task_q</span><span class="p">:</span> <span class="s2">&quot;deque[BaseOperator]&quot;</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="n">task_q</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dag</span><span class="o">.</span><span class="n">roots</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">task_q</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">task_q</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+            <span class="n">dg</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">task</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">downstream_list</span><span class="p">:</span>
+                <span class="n">task_q</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">downstream_list</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">task</span><span class="o">.</span><span class="n">downstream_list</span><span class="p">:</span>
+                    <span class="n">dg</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">child</span><span class="p">)</span>
+                    <span class="n">dg</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">child</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dg</span></div>
+
+<div class="viewcode-block" id="TransformerUtils.get_digraph_from_matcher_dag"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils.get_digraph_from_matcher_dag">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_digraph_from_matcher_dag</span><span class="p">(</span><span class="n">matcher_roots</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TaskMatcher</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct a :class:`~networkx.DiGraph` from the given :class:`~ditto.api.TaskMatcher` dag</span>
+
+<span class="sd">        :param dag: the matcher DAG</span>
+<span class="sd">        :return: the networkx DiGraph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dg</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">OrderedDiGraph</span><span class="p">()</span>
+        <span class="n">matcher_q</span><span class="p">:</span> <span class="s2">&quot;deque[TaskMatcher]&quot;</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="n">matcher_q</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">matcher_roots</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">matcher_q</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">matcher</span> <span class="o">=</span> <span class="n">matcher_q</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+            <span class="n">dg</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">matcher</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">matcher</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">matcher</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="n">matcher_q</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">matcher</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">matcher</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                    <span class="n">dg</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">child</span><span class="p">)</span>
+                    <span class="n">dg</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">matcher</span><span class="p">,</span> <span class="n">child</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dg</span></div>
+
+<div class="viewcode-block" id="TransformerUtils.find_sub_dag"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils.find_sub_dag">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">find_sub_dag</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dag</span><span class="p">:</span> <span class="n">DAG</span><span class="p">,</span> <span class="n">matcher_roots</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TaskMatcher</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The problem is to find a sub-DAG in a DAG where the sub-DAG&#39;s nodes are</span>
+<span class="sd">        matcher functions which test nodes</span>
+
+<span class="sd">        It can be generalized to: find if a DAG or DiGraph G1 is isomorphic with</span>
+<span class="sd">        a DAG G2, with the node comparison function being running of the matchers in G1</span>
+<span class="sd">        on nodes in G2</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            This uses python&#39;s NetworkX graph library which uses the</span>
+<span class="sd">            `VF2 &lt;https://networkx.github.io/documentation/stable/reference/algorithms/isomorphism.vf2.html&gt;`_</span>
+<span class="sd">            algorithm for `graph isomorphism &lt;https://ieeexplore.ieee.org/document/1323804&gt;`_.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            We are trying to find an exact sub-DAG match. In graph theory, this is called a</span>
+<span class="sd">            `node-induced &lt;https://math.stackexchange.com/questions/1013143/difference-between-a-sub-graph-and-induced-sub-graph&gt;`_</span>
+<span class="sd">            subgraph. A subgraph 𝐻 of 𝐺 is called INDUCED, if for any two vertices</span>
+<span class="sd">            𝑢,𝑣 in 𝐻, 𝑢 and 𝑣 are adjacent in 𝐻 if and only if they are adjacent in 𝐺.</span>
+<span class="sd">            In other words, 𝐻 has the same edges as 𝐺 between the vertices in 𝐻.</span>
+
+<span class="sd">        .. seealso::</span>
+
+<span class="sd">            This is an NP-complete problem: https://en.wikipedia.org/wiki/Subgraph_isomorphism_problem</span>
+
+<span class="sd">        :param task: the DAG where the sub-dag has to be found</span>
+<span class="sd">        :param matcher: the root task matcher of the [TaskMatcher] dag</span>
+<span class="sd">        :return: a tuple containing the :class:`~networkx.DiGraph` of the souce DAG</span>
+<span class="sd">            and the list of matching subdag :class:`~networkx.DiGraph`\&#39;s</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dag_dg</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_digraph_from_airflow_dag</span><span class="p">(</span><span class="n">dag</span><span class="p">)</span>
+        <span class="n">matcher_dg</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_digraph_from_matcher_dag</span><span class="p">(</span><span class="n">matcher_roots</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">node_matcher</span><span class="p">(</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">):</span>
+            <span class="n">task</span><span class="p">:</span> <span class="n">BaseOperator</span> <span class="o">=</span> <span class="n">n1</span><span class="p">[</span><span class="s1">&#39;op&#39;</span><span class="p">]</span>
+            <span class="n">matcher</span><span class="p">:</span> <span class="n">TaskMatcher</span> <span class="o">=</span> <span class="n">n2</span><span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">matcher</span><span class="o">.</span><span class="n">does_match</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+        <span class="n">digm</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">isomorphism</span><span class="o">.</span><span class="n">DiGraphMatcher</span><span class="p">(</span><span class="n">dag_dg</span><span class="p">,</span> <span class="n">matcher_dg</span><span class="p">,</span> <span class="n">node_match</span><span class="o">=</span><span class="n">node_matcher</span><span class="p">)</span>
+        <span class="n">subdags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">digm</span><span class="o">.</span><span class="n">subgraph_is_isomorphic</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">subgraph</span> <span class="ow">in</span> <span class="n">digm</span><span class="o">.</span><span class="n">subgraph_isomorphisms_iter</span><span class="p">():</span>
+                <span class="n">subdags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dag_dg</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">subgraph</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">dag_dg</span><span class="p">,</span> <span class="n">subdags</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TransformerUtils.remove_task_from_dag"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils.remove_task_from_dag">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">remove_task_from_dag</span><span class="p">(</span><span class="n">dag</span><span class="p">:</span> <span class="n">DAG</span><span class="p">,</span> <span class="n">dag_nodes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseOperator</span><span class="p">],</span> <span class="n">task</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes the given list of :class:`~airflow.models.BaseOperator`\&#39;s from the given</span>
+<span class="sd">        :class:`~airflow.models.DAG`</span>
+
+<span class="sd">        :param dag: the source airflow DAG</span>
+<span class="sd">        :param dag_nodes: the list of nodes in the source DAG</span>
+<span class="sd">        :param task: the task to remove</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_other_tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">dag_nodes</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">task</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">this_task</span> <span class="ow">in</span> <span class="n">all_other_tasks</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">task_id</span> <span class="ow">in</span> <span class="n">this_task</span><span class="o">.</span><span class="n">_upstream_task_ids</span><span class="p">:</span>
+                <span class="n">this_task</span><span class="o">.</span><span class="n">_upstream_task_ids</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">task_id</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">task_id</span> <span class="ow">in</span> <span class="n">this_task</span><span class="o">.</span><span class="n">_downstream_task_ids</span><span class="p">:</span>
+                <span class="n">this_task</span><span class="o">.</span><span class="n">_downstream_task_ids</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">task_id</span><span class="p">)</span>
+
+        <span class="n">task</span><span class="o">.</span><span class="n">_upstream_task_ids</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">task</span><span class="o">.</span><span class="n">_downstream_task_ids</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">task</span><span class="o">.</span><span class="n">_dag</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">del</span> <span class="n">dag</span><span class="o">.</span><span class="n">task_dict</span><span class="p">[</span><span class="n">task</span><span class="o">.</span><span class="n">task_id</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="TransformerUtils.find_matching_tasks"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils.find_matching_tasks">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">find_matching_tasks</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">subdag</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">,</span> <span class="n">matcher</span><span class="p">:</span> <span class="n">TaskMatcher</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find matching tasks in a :class:`~networkx.DiGraph` of operators</span>
+
+<span class="sd">        :param subdag: the dag to search for matches</span>
+<span class="sd">        :param matcher: the task matcher to use</span>
+<span class="sd">        :return: matching nodes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">matching_nodes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">subdag</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">matcher</span><span class="o">.</span><span class="n">does_match</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+                <span class="n">matching_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">matching_nodes</span></div>
+
+<div class="viewcode-block" id="TransformerUtils.assign_task_to_dag"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils.assign_task_to_dag">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">assign_task_to_dag</span><span class="p">(</span><span class="n">op</span><span class="p">:</span> <span class="n">BaseOperator</span><span class="p">,</span> <span class="n">dag</span><span class="p">:</span> <span class="n">DAG</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assigns the given :class:`~airflow.models.BaseOperator` and all its downstream</span>
+<span class="sd">        tasks to the given :class:`~airflow.models.DAG`</span>
+
+<span class="sd">        :param op: the task to assign</span>
+<span class="sd">        :param dag: the dag to assign the task and its downstream to</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">task_q</span><span class="p">:</span> <span class="s2">&quot;deque[BaseOperator]&quot;</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="n">task_q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+        <span class="n">seen_tasks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">task_q</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">task_q</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+            <span class="n">task</span><span class="o">.</span><span class="n">dag</span> <span class="o">=</span> <span class="n">dag</span>
+            <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">downstream_list</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">task</span><span class="o">.</span><span class="n">downstream_list</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">child</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_tasks</span><span class="p">:</span>
+                        <span class="n">task_q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+                        <span class="n">seen_tasks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">child</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TransformerUtils.add_dag_fragment_to_dag"><a class="viewcode-back" href="../../source/ditto.utils.html#ditto.utils.TransformerUtils.add_dag_fragment_to_dag">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">add_dag_fragment_to_dag</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dag</span><span class="p">:</span> <span class="n">DAG</span><span class="p">,</span> <span class="n">frag</span><span class="p">:</span> <span class="n">DAGFragment</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Traverses and assigns all the tasks in this fragment</span>
+<span class="sd">        to the given DAG using :meth:`.assign_task_to_dag`</span>
+
+<span class="sd">        :param dag: the dag to assign the fragment&#39;s tasks to</span>
+<span class="sd">        :param frag: the dag fragment to assign</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fragment_q</span><span class="p">:</span> <span class="s2">&quot;deque[DAGFragment]&quot;</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="n">fragment_q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frag</span><span class="p">)</span>
+        <span class="n">seen_frag</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">fragment_q</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">frag</span> <span class="o">=</span> <span class="n">fragment_q</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">frag</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">assign_task_to_dag</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">dag</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">frag</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">frag</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">seen_frag</span><span class="p">:</span>
+                        <span class="n">fragment_q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+                        <span class="n">seen_frag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">child</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Angad Singh
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

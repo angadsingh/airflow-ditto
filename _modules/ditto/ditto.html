@@ -1,0 +1,471 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ditto.ditto &mdash; airflow-ditto 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/sphinx_paramlinks.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> airflow-ditto
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.api.html">ditto.api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.ditto.html">ditto.ditto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.rendering.html">ditto.rendering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.utils.html">ditto.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.matchers.html">ditto.matchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.resolvers.html">ditto.resolvers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.templates.html">ditto.templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/ditto.transformers.html">ditto.transformers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">airflow-ditto</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>ditto.ditto</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ditto.ditto</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">queue</span> <span class="kn">import</span> <span class="n">Queue</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Type</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">airflow</span> <span class="kn">import</span> <span class="n">DAG</span>
+<span class="kn">from</span> <span class="nn">airflow.models</span> <span class="kn">import</span> <span class="n">BaseOperator</span>
+
+<span class="kn">from</span> <span class="nn">ditto</span> <span class="kn">import</span> <span class="n">rendering</span>
+<span class="kn">from</span> <span class="nn">ditto.api</span> <span class="kn">import</span> <span class="n">TransformerDefaultsConf</span><span class="p">,</span> <span class="n">SubDagTransformer</span><span class="p">,</span> <span class="n">DAGFragment</span><span class="p">,</span> \
+    <span class="n">TransformerResolver</span>
+<span class="kn">from</span> <span class="nn">ditto.transformers</span> <span class="kn">import</span> <span class="n">CopyTransformer</span>
+<span class="kn">from</span> <span class="nn">ditto.utils</span> <span class="kn">import</span> <span class="n">TransformerUtils</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AirflowDagTransformer"><a class="viewcode-back" href="../../source/ditto.ditto.html#ditto.ditto.AirflowDagTransformer">[docs]</a><span class="k">class</span> <span class="nc">AirflowDagTransformer</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ditto&#39;s core logic is executed by this class. It executes two operations on a DAG in sequence.</span>
+<span class="sd">    First it will run the provided subdag transformers to transform the source DAG itself</span>
+<span class="sd">    Then it will transform the operators in the source dag and create a target DAG out of the</span>
+<span class="sd">    returned :class:`~ditto.api.DAGFragment`\&#39;s.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">target_dag</span><span class="p">:</span> <span class="n">DAG</span><span class="p">,</span>
+                 <span class="n">transformer_defaults</span><span class="p">:</span> <span class="n">TransformerDefaultsConf</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">transformer_resolvers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TransformerResolver</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">subdag_transformers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">SubDagTransformer</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">debug_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param target_dag: ditto allows you to provide a pre-fabricated airflow DAG object</span>
+<span class="sd">            so that you can set essential parameters like it&#39;s ``schedule_interval``, ``params``,</span>
+<span class="sd">            give it a unique ``dag_id``, etc. outside of ditto itself, instead of ditto</span>
+<span class="sd">            copying the attributes of the DAG over from the source DAG. This gives more flexbility.</span>
+<span class="sd">        :param transformer_defaults: allows you to pass a map of transformer type to their default</span>
+<span class="sd">            configuration. This is helpful to pass things like a default operator to use when the</span>
+<span class="sd">            transformer cannot transform the source operator for some reason, or any other configuration</span>
+<span class="sd">            required by the transformer</span>
+<span class="sd">        :param transformer_resolvers: resolvers to use to find the transformers for each kind of</span>
+<span class="sd">            operator in the source DAG.</span>
+<span class="sd">        :param subdag_transformers: subdag transformers to use for converting matching subdags</span>
+<span class="sd">            in the source DAG to transformed subdags</span>
+<span class="sd">        :param debug_mode: when `True` it will render the intermediate results of transformation</span>
+<span class="sd">            using `networkx &lt;https://networkx.github.io/&gt;`_ and `maplotlib &lt;https://matplotlib.org/&gt;`_</span>
+<span class="sd">            so that you can debug your transformations easily.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformer_cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_dag</span> <span class="o">=</span> <span class="n">target_dag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformer_defaults</span> <span class="o">=</span> <span class="n">transformer_defaults</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformer_resolvers</span> <span class="o">=</span> <span class="n">transformer_resolvers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subdag_transformers</span> <span class="o">=</span> <span class="n">subdag_transformers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug_mode</span> <span class="o">=</span> <span class="n">debug_mode</span>
+
+<div class="viewcode-block" id="AirflowDagTransformer.transform_operators"><a class="viewcode-back" href="../../source/ditto.ditto.html#ditto.ditto.AirflowDagTransformer.transform_operators">[docs]</a>    <span class="k">def</span> <span class="nf">transform_operators</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_dag</span><span class="p">:</span> <span class="n">DAG</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transforms the operators in the source DAG and creates the target DAG out of the returned</span>
+<span class="sd">        :class:`~ditto.api.DAGFragment`\&#39;s. Finds the transformers by running each operator through</span>
+<span class="sd">        all the resolvers passed.</span>
+
+<span class="sd">        Does a bread-first-traversal on the source DAG such that the result of the transformation</span>
+<span class="sd">        of upstream (and previous ops in this level) are available to downstream transformers in</span>
+<span class="sd">        level-order. This is helpful for real world use cases of transformation like having a</span>
+<span class="sd">        spark step op transformer read the result of the transformation of a cluster create op transformer.</span>
+
+<span class="sd">        Caches the results of transformations to avoid repeat work, as this is a graph, not a tree</span>
+<span class="sd">        being traversed.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            Stitches the final target DAG after having transformed all operators.</span>
+
+<span class="sd">        :param src_dag: the source airflow DAG to be operator-transformed</span>
+<span class="sd">        :return: does not return anything. mutates ``self.target_dag`` directly</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">src_task_q</span><span class="p">:</span> <span class="s2">&quot;Queue[(BaseOperator,DAGFragment)]&quot;</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">root</span> <span class="ow">in</span> <span class="n">src_dag</span><span class="o">.</span><span class="n">roots</span><span class="p">:</span>
+            <span class="n">src_task_q</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">root</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+
+        <span class="c1"># a list representing all processed fragments so far</span>
+        <span class="c1"># transformers can use this to fetch information from the</span>
+        <span class="c1"># level before or even tasks before this one in the same level</span>
+        <span class="c1"># we&#39;ll also use this to stetch our final airflow DAG together</span>
+        <span class="n">transformed_dag_fragments</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">src_task_q</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+            <span class="n">src_task</span><span class="p">,</span> <span class="n">parent_fragment</span> <span class="o">=</span> <span class="n">src_task_q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+            <span class="c1"># since this is a graph, we can encounter the same source</span>
+            <span class="c1"># task repeatedly if it has multiple parents in the src_dag</span>
+            <span class="c1"># to avoid transforming it repeatedly, check if has already been seen</span>
+            <span class="n">task_dag_fragment</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">cached_fragment</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">src_task</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer_cache</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Already transformed source task: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">src_task</span><span class="p">)</span>
+                <span class="n">task_dag_fragment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer_cache</span><span class="p">[</span><span class="n">src_task</span><span class="p">]</span>
+                <span class="n">cached_fragment</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># get transformer class for this operator</span>
+                <span class="n">transformer_cl</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">for</span> <span class="n">resolver</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer_resolvers</span><span class="p">:</span>
+                    <span class="n">transformer_cl</span> <span class="o">=</span> <span class="n">resolver</span><span class="o">.</span><span class="n">resolve_transformer</span><span class="p">(</span><span class="n">src_task</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">transformer_cl</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found transformer for operator </span><span class="si">{</span><span class="n">src_task</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;: </span><span class="si">{</span><span class="n">transformer_cl</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> using </span><span class="si">{</span><span class="n">resolver</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">break</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">transformer_cl</span><span class="p">:</span>
+                    <span class="n">transformer_cl</span> <span class="o">=</span> <span class="n">CopyTransformer</span>
+
+                <span class="c1"># get transformer defaults for this operator</span>
+                <span class="n">transformer_defaults</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer_defaults</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">transformer_cl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer_defaults</span><span class="o">.</span><span class="n">defaults</span><span class="p">:</span>
+                        <span class="n">transformer_defaults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer_defaults</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="n">transformer_cl</span><span class="p">]</span>
+
+                <span class="c1"># create the transformer</span>
+                <span class="n">transformer</span> <span class="o">=</span> <span class="n">transformer_cl</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_dag</span><span class="p">,</span> <span class="n">transformer_defaults</span><span class="p">)</span>
+
+                <span class="c1"># do transformation, and get DAGFragment</span>
+                <span class="n">task_dag_fragment</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">src_task</span><span class="p">,</span>
+                                <span class="n">parent_fragment</span><span class="p">,</span> <span class="n">transformed_dag_fragments</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">transformer_cache</span><span class="p">[</span><span class="n">src_task</span><span class="p">]</span> <span class="o">=</span> <span class="n">task_dag_fragment</span>
+
+                <span class="c1"># add this transformed output fragment to</span>
+                <span class="c1"># the upstream fragments processed so far</span>
+                <span class="n">transformed_dag_fragments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task_dag_fragment</span><span class="p">)</span>
+
+                <span class="c1"># add children to queue</span>
+                <span class="k">if</span> <span class="n">src_task</span><span class="o">.</span><span class="n">downstream_list</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">downstream_task</span> <span class="ow">in</span> <span class="n">src_task</span><span class="o">.</span><span class="n">downstream_list</span><span class="p">:</span>
+                        <span class="n">src_task_q</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">downstream_task</span><span class="p">,</span> <span class="n">task_dag_fragment</span><span class="p">))</span>
+
+            <span class="c1"># chain it to the parent</span>
+            <span class="k">if</span> <span class="n">parent_fragment</span><span class="p">:</span>
+                <span class="n">task_dag_fragment</span><span class="o">.</span><span class="n">add_parent</span><span class="p">(</span><span class="n">parent_fragment</span><span class="p">)</span>
+
+        <span class="c1"># convert dag fragment relationships to airflow dag relationships</span>
+        <span class="c1"># for the processed fragments (which are now available in topological</span>
+        <span class="c1"># sorted order)</span>
+        <span class="k">for</span> <span class="n">output_fragment</span> <span class="ow">in</span> <span class="n">transformed_dag_fragments</span><span class="p">:</span>
+            <span class="c1"># get a flattened list of roots for the child DAGFragments</span>
+            <span class="n">all_child_fragment_roots</span> <span class="o">=</span> <span class="p">[</span><span class="n">step</span> <span class="k">for</span> <span class="n">frag</span> <span class="ow">in</span> <span class="n">output_fragment</span><span class="o">.</span><span class="n">children</span> <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">frag</span><span class="o">.</span><span class="n">tasks</span><span class="p">]</span>
+
+            <span class="c1"># attach the flattened roots of child DAGFragments to this DAGFragment</span>
+            <span class="n">TransformerUtils</span><span class="o">.</span><span class="n">add_downstream_dag_fragment</span><span class="p">(</span><span class="n">output_fragment</span><span class="p">,</span>
+                                    <span class="n">DAGFragment</span><span class="p">(</span><span class="n">all_child_fragment_roots</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="AirflowDagTransformer.transform_sub_dags"><a class="viewcode-back" href="../../source/ditto.ditto.html#ditto.ditto.AirflowDagTransformer.transform_sub_dags">[docs]</a>    <span class="k">def</span> <span class="nf">transform_sub_dags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_dag</span><span class="p">:</span> <span class="n">DAG</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transforms the subdags of the source DAG, as matched by the :class:`~ditto.api.TaskMatcher`</span>
+<span class="sd">        DAG provided by the :class:`~ditto.api.SubDagTransformer`\&#39;s :meth:`~ditto.api.SubDagTransformer.get_sub_dag_matcher`</span>
+<span class="sd">        method.</span>
+
+<span class="sd">        Multiple subdag transformers can run through the source DAG, and each of them can</span>
+<span class="sd">        match+transform multiple subdags of the source DAG, _and_ each such transformation can</span>
+<span class="sd">        return multiple subdags as a result, so this can get quite flexible if you want.</span>
+
+<span class="sd">        The final DAG is carefully stitched with all the results of the subdag transformations.</span>
+
+<span class="sd">        See the unit tests at `test_core.py` for complex examples.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            If your matched input subdag had different leaves pointing to different</span>
+<span class="sd">            operators/nodes, the transformed subdags leaves will just get multiplexed</span>
+<span class="sd">            to all the leaves of the `source DAG`, since it is not possible to know which</span>
+<span class="sd">            new leaf is to be stitched to which node of the source DAG, and resolve</span>
+<span class="sd">            new relationships based on old ones.</span>
+
+<span class="sd">        .. warning::</span>
+
+<span class="sd">            Make sure that you don&#39;t provide :class:`~ditto.api.SubDagTransformer`\&#39;s which</span>
+<span class="sd">            with overlapping subdag matchers, otherwise things can understandably get messy.</span>
+
+<span class="sd">        .. seealso::</span>
+
+<span class="sd">            The core logic behind this method lies in a graph algorithm called</span>
+<span class="sd">            subgraph isomorphism, and is explained in detail at</span>
+<span class="sd">            :meth:`~ditto.utils.TransformerUtils.find_sub_dag`</span>
+
+<span class="sd">        :param src_dag: the source airflow DAG to be subdag-transformed</span>
+<span class="sd">        :return: does not return anything. mutates the passed ``src_dag`` directly,</span>
+<span class="sd">            which is why you should pass a copy of the source DAG.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">subdag_transformer_cl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subdag_transformers</span><span class="p">:</span>
+            <span class="n">transformer_defaults</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer_defaults</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">subdag_transformer_cl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer_defaults</span><span class="o">.</span><span class="n">defaults</span><span class="p">:</span>
+                    <span class="n">transformer_defaults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer_defaults</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="n">subdag_transformer_cl</span><span class="p">]</span>
+            <span class="n">subdag_transformer</span> <span class="o">=</span> <span class="n">subdag_transformer_cl</span><span class="p">(</span><span class="n">src_dag</span><span class="p">,</span> <span class="n">transformer_defaults</span><span class="p">)</span>
+            <span class="n">matcher_roots</span> <span class="o">=</span> <span class="n">subdag_transformer</span><span class="o">.</span><span class="n">get_sub_dag_matcher</span><span class="p">()</span>
+
+            <span class="c1"># find matching sub-dags usng the [TaskMatcher] DAG</span>
+            <span class="n">src_dag_dg</span><span class="p">,</span> <span class="n">subdags</span> <span class="o">=</span> <span class="n">TransformerUtils</span><span class="o">.</span><span class="n">find_sub_dag</span><span class="p">(</span><span class="n">src_dag</span><span class="p">,</span> <span class="n">matcher_roots</span><span class="p">)</span>
+            <span class="n">src_dag_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">src_dag_dg</span><span class="o">.</span><span class="n">nodes</span><span class="p">]</span>
+
+            <span class="c1"># transform each matching sub-dag and replace it in the DAG</span>
+            <span class="n">cloned_subdags</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">subdags</span><span class="p">)</span>
+
+            <span class="c1"># deep copy since DiGraph holds weak refs and that creates a problem</span>
+            <span class="c1"># with traversing the DiGraph after deleting nodes from the original airflow DAG</span>
+            <span class="k">for</span> <span class="n">subdag</span><span class="p">,</span> <span class="n">cloned_subdag</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">subdags</span><span class="p">,</span> <span class="n">cloned_subdags</span><span class="p">):</span>
+                <span class="c1"># upstream tasks are nodes in the main dag in-edges of the nodes in this sub-dag</span>
+                <span class="c1"># which do not belong to this sub-dag</span>
+                <span class="n">subdag_upstream_tasks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">src_dag_dg</span><span class="o">.</span><span class="n">in_edges</span><span class="p">(</span><span class="n">nbunch</span><span class="o">=</span><span class="n">subdag</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> \
+                                            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">edge</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">subdag</span><span class="p">)</span>
+                <span class="c1"># downstream tasks are nodes in the main dag out-edges of the nodes in this sub-dag</span>
+                <span class="c1"># which do not belong to this sub-dag</span>
+                <span class="n">subdag_downstream_tasks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">src_dag_dg</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">nbunch</span><span class="o">=</span><span class="n">subdag</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> \
+                                            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">edge</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">subdag</span><span class="p">)</span>
+
+                <span class="n">subdag_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">subdag</span><span class="o">.</span><span class="n">nodes</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">subdag_nodes</span><span class="p">:</span>
+                    <span class="n">TransformerUtils</span><span class="o">.</span><span class="n">remove_task_from_dag</span><span class="p">(</span><span class="n">src_dag</span><span class="p">,</span> <span class="n">src_dag_nodes</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
+
+                <span class="n">new_subdag_fragment</span> <span class="o">=</span> <span class="n">subdag_transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">cloned_subdag</span><span class="p">,</span> <span class="n">DAGFragment</span><span class="p">(</span><span class="n">subdag_upstream_tasks</span><span class="p">))</span>
+
+                <span class="c1"># attach new subdag to upstream</span>
+                <span class="k">if</span> <span class="n">subdag_upstream_tasks</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">parent</span> <span class="ow">in</span> <span class="n">subdag_upstream_tasks</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">new_root</span> <span class="ow">in</span> <span class="n">new_subdag_fragment</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span>
+                            <span class="n">parent</span><span class="o">.</span><span class="n">set_downstream</span><span class="p">(</span><span class="n">new_root</span><span class="p">)</span>
+
+                <span class="c1"># assign new subdag to src_dag</span>
+                <span class="n">TransformerUtils</span><span class="o">.</span><span class="n">add_dag_fragment_to_dag</span><span class="p">(</span><span class="n">src_dag</span><span class="p">,</span> <span class="n">new_subdag_fragment</span><span class="p">)</span>
+
+                <span class="c1"># attach downstream to the leaves of the new subdag</span>
+                <span class="n">TransformerUtils</span><span class="o">.</span><span class="n">add_downstream_dag_fragment</span><span class="p">(</span><span class="n">new_subdag_fragment</span><span class="p">,</span> <span class="n">DAGFragment</span><span class="p">(</span><span class="n">subdag_downstream_tasks</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="AirflowDagTransformer.transform"><a class="viewcode-back" href="../../source/ditto.ditto.html#ditto.ditto.AirflowDagTransformer.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_dag</span><span class="p">:</span> <span class="n">DAG</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is the entry point to using ditto, and is the only method you</span>
+<span class="sd">        should have to call after creating the transformer object. This calls</span>
+<span class="sd">        the :meth:`.transform_sub_dags` and :meth:`.transform_operators` methods</span>
+<span class="sd">        in sequence to realize the final :attr:`target_dag` and return it</span>
+
+<span class="sd">        :param src_dag: the source airflow DAG to be ditto-transformed</span>
+<span class="sd">        :return: the resultant transformed DAG</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># transform sub-DAGs of the src_dag</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subdag_transformers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transform_sub_dags</span><span class="p">(</span><span class="n">src_dag</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug_mode</span><span class="p">:</span>
+            <span class="n">rendering</span><span class="o">.</span><span class="n">debug_dags</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">src_dag</span><span class="p">],</span>
+                <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+
+        <span class="c1"># transform each step of the src_dag</span>
+        <span class="c1"># and add it to the target_dag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform_operators</span><span class="p">(</span><span class="n">src_dag</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug_mode</span><span class="p">:</span>
+            <span class="n">rendering</span><span class="o">.</span><span class="n">debug_dags</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">src_dag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_dag</span><span class="p">],</span>
+                <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_dag</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Angad Singh
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

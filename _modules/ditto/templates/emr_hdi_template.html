@@ -1,0 +1,272 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ditto.templates.emr_hdi_template &mdash; airflow-ditto 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> airflow-ditto
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/ditto.api.html">ditto.api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/ditto.ditto.html">ditto.ditto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/ditto.rendering.html">ditto.rendering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/ditto.utils.html">ditto.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/ditto.matchers.html">ditto.matchers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/ditto.resolvers.html">ditto.resolvers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/ditto.templates.html">ditto.templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/ditto.transformers.html">ditto.transformers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">airflow-ditto</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>ditto.templates.emr_hdi_template</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ditto.templates.emr_hdi_template</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">airflow</span> <span class="kn">import</span> <span class="n">DAG</span>
+<span class="kn">from</span> <span class="nn">airflow.contrib.operators.emr_add_steps_operator</span> <span class="kn">import</span> <span class="n">EmrAddStepsOperator</span>
+<span class="kn">from</span> <span class="nn">airflow.contrib.operators.emr_create_job_flow_operator</span> <span class="kn">import</span> <span class="n">EmrCreateJobFlowOperator</span>
+<span class="kn">from</span> <span class="nn">airflow.contrib.operators.emr_terminate_job_flow_operator</span> <span class="kn">import</span> <span class="n">EmrTerminateJobFlowOperator</span>
+<span class="kn">from</span> <span class="nn">airflow.contrib.sensors.emr_job_flow_sensor</span> <span class="kn">import</span> <span class="n">EmrJobFlowSensor</span>
+<span class="kn">from</span> <span class="nn">airflow.contrib.sensors.emr_step_sensor</span> <span class="kn">import</span> <span class="n">EmrStepSensor</span>
+<span class="kn">from</span> <span class="nn">airflow.models</span> <span class="kn">import</span> <span class="n">BaseOperator</span>
+<span class="kn">from</span> <span class="nn">airflow.operators.sensors</span> <span class="kn">import</span> <span class="n">S3KeySensor</span>
+
+<span class="kn">from</span> <span class="nn">ditto.api</span> <span class="kn">import</span> <span class="n">TransformerDefaultsConf</span><span class="p">,</span> <span class="n">OperatorTransformer</span><span class="p">,</span> <span class="n">TransformerResolver</span><span class="p">,</span> <span class="n">SubDagTransformer</span>
+<span class="kn">from</span> <span class="nn">ditto.ditto</span> <span class="kn">import</span> <span class="n">AirflowDagTransformer</span>
+<span class="kn">from</span> <span class="nn">ditto.transformers.emr</span> <span class="kn">import</span> <span class="n">EmrCreateJobFlowOperatorTransformer</span>
+<span class="kn">from</span> <span class="nn">ditto.transformers.emr</span> <span class="kn">import</span> <span class="n">EmrJobFlowSensorTransformer</span>
+<span class="kn">from</span> <span class="nn">ditto.transformers.emr</span> <span class="kn">import</span> <span class="n">EmrAddStepsOperatorTransformer</span>
+<span class="kn">from</span> <span class="nn">ditto.transformers.emr</span> <span class="kn">import</span> <span class="n">EmrStepSensorTransformer</span>
+<span class="kn">from</span> <span class="nn">ditto.transformers.emr</span> <span class="kn">import</span> <span class="n">EmrTerminateJobFlowOperatorTransformer</span>
+<span class="kn">from</span> <span class="nn">ditto.transformers.s3</span> <span class="kn">import</span> <span class="n">S3KeySensorBlobOperatorTransformer</span>
+<span class="kn">from</span> <span class="nn">ditto.resolvers</span> <span class="kn">import</span> <span class="n">ClassTransformerResolver</span><span class="p">,</span> <span class="n">AncestralClassTransformerResolver</span>
+
+
+<div class="viewcode-block" id="EmrHdiDagTransformerTemplate"><a class="viewcode-back" href="../../../source/templates/ditto.templates.EmrHdiDagTransformerTemplate.html#ditto.templates.EmrHdiDagTransformerTemplate">[docs]</a><span class="k">class</span> <span class="nc">EmrHdiDagTransformerTemplate</span><span class="p">(</span><span class="n">AirflowDagTransformer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the defacto template to use for converting an EMR-based airflow DAG</span>
+<span class="sd">    to an Azure HDInsight based airlow DAG in ditto, unless you encounter</span>
+<span class="sd">    more complex patterns, in which case you can always create your own template.</span>
+
+<span class="sd">    This is easily sub-classable.</span>
+
+<span class="sd">    .. seealso::</span>
+
+<span class="sd">        See `examples/example_emr_job_flow_dag.py` for an example.</span>
+<span class="sd">        You can find more examples in the unit tests at `tests/test_dag_transformations.py`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_dag</span><span class="p">:</span> <span class="n">DAG</span><span class="p">,</span>
+                 <span class="n">transformer_defaults</span><span class="p">:</span> <span class="n">TransformerDefaultsConf</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">operator_transformers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BaseOperator</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">OperatorTransformer</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">transformer_resolvers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TransformerResolver</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">subdag_transformers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">SubDagTransformer</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">_operator_transformers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">EmrCreateJobFlowOperator</span><span class="p">:</span> <span class="n">EmrCreateJobFlowOperatorTransformer</span><span class="p">,</span>
+            <span class="n">EmrJobFlowSensor</span><span class="p">:</span> <span class="n">EmrJobFlowSensorTransformer</span><span class="p">,</span>
+            <span class="n">EmrAddStepsOperator</span><span class="p">:</span> <span class="n">EmrAddStepsOperatorTransformer</span><span class="p">,</span>
+            <span class="n">EmrStepSensor</span><span class="p">:</span> <span class="n">EmrStepSensorTransformer</span><span class="p">,</span>
+            <span class="n">EmrTerminateJobFlowOperator</span><span class="p">:</span> <span class="n">EmrTerminateJobFlowOperatorTransformer</span><span class="p">,</span>
+            <span class="n">S3KeySensor</span><span class="p">:</span> <span class="n">S3KeySensorBlobOperatorTransformer</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">operator_transformers</span><span class="p">:</span>
+            <span class="n">_operator_transformers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">operator_transformers</span><span class="p">)</span>
+
+        <span class="n">_transformer_resolvers</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">ClassTransformerResolver</span><span class="p">(</span><span class="n">_operator_transformers</span><span class="p">),</span>
+            <span class="n">AncestralClassTransformerResolver</span><span class="p">(</span><span class="n">_operator_transformers</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="n">transformer_resolvers</span><span class="p">:</span>
+            <span class="n">_transformer_resolvers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transformer_resolvers</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target_dag</span><span class="p">,</span>
+                         <span class="n">transformer_defaults</span><span class="o">=</span><span class="n">transformer_defaults</span><span class="p">,</span>
+                         <span class="n">transformer_resolvers</span><span class="o">=</span><span class="n">_transformer_resolvers</span><span class="p">,</span>
+                         <span class="n">subdag_transformers</span><span class="o">=</span><span class="n">subdag_transformers</span><span class="p">,</span>
+                         <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Angad Singh
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
