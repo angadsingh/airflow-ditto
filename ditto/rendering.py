@@ -1,5 +1,5 @@
 import os
-CI_MODE = bool(os.environ['TRAVIS'])
+CI_MODE = bool(os.environ.get('TRAVIS', False))
 
 if not CI_MODE:
     import matplotlib
