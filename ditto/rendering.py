@@ -1,12 +1,16 @@
+import os
+CI_MODE = bool(os.environ('TRAVIS'))
+
+if not CI_MODE:
+    import matplotlib
+    from matplotlib import patches
+    import matplotlib.pyplot as plt
+
 import random
 from typing import List
-
-import matplotlib
 import networkx as nx
 from airflow import DAG
-from matplotlib import patches
 from networkx.drawing.nx_agraph import graphviz_layout
-import matplotlib.pyplot as plt
 
 from ditto.api import Transformer
 from ditto.utils import TransformerUtils
