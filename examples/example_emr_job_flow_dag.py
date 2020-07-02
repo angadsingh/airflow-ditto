@@ -1,5 +1,6 @@
 import os
 
+from airflow.contrib.operators.emr_terminate_job_flow_operator import EmrTerminateJobFlowOperator
 from airflow.operators.sensors import S3KeySensor
 
 from ditto import rendering
@@ -126,19 +127,18 @@ with DAG(
         bucket_key='{{ params.bucket_key }}',
         wildcard_match=True)
 
-    # terminate_cluster_op = EmrTerminateJobFlowOperator(
-    #     task_id='remove_cluster',
-    #     job_flow_id="{{ task_instance.xcom_pull(task_ids='create_cluster', key='return_value') }}",
-    #     aws_conn_id=get_config('emr')['aws_conn_id']
-    # )
+    terminate_cluster_op = EmrTerminateJobFlowOperator(
+        task_id='remove_cluster',
+        job_flow_id="{{ task_instance.xcom_pull(task_ids='create_cluster', key='return_value') }}",
+        aws_conn_id=get_config('emr')['aws_conn_id']
+    )
 
     handle_failure_op = PythonOperator(
         task_id='handle_failure',
         python_callable=handle_failure_task,
         trigger_rule=trigger_rule.TriggerRule.ONE_FAILED)
 
-    create_cluster_op >> monitor_cluster_op >> handle_failure_op
-    # create_cluster_op >> add_steps_to_cluster_op >> monitor_step_op >> terminate_cluster_op
+    create_cluster_op >> monitor_cluster_op >> handle_failure_op >> terminate_cluster_op
     create_cluster_op >> validate_path_exists >> add_steps_to_cluster_op >> [monitor_step_op_1, monitor_step_op_2]
 
 hdi_create_cluster_op = ConnectedAzureHDInsightCreateClusterOperator(task_id="inferred",

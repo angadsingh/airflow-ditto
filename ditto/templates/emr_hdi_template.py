@@ -21,6 +21,18 @@ from ditto.resolvers import ClassTransformerResolver, AncestralClassTransformerR
 
 
 class EmrHdiDagTransformerTemplate(AirflowDagTransformer):
+    """
+    This is the defacto template to use for converting an EMR-based airflow DAG
+    to an Azure HDInsight based airlow DAG in ditto, unless you encounter
+    more complex patterns, in which case you can always create your own template.
+
+    This is easily sub-classable.
+
+    .. seealso::
+
+        See `examples/example_emr_job_flow_dag.py` for an example.
+        You can find more examples in the unit tests at `tests/test_dag_transformations.py`
+    """
     def __init__(self, target_dag: DAG,
                  transformer_defaults: TransformerDefaultsConf = None,
                  operator_transformers: Dict[Type[BaseOperator], Type[OperatorTransformer]] = None,

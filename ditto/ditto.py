@@ -18,12 +18,36 @@ log = logging.getLogger(__name__)
 
 
 class AirflowDagTransformer:
+    """
+    Ditto's core logic is executed by this class. It executes two operations on a DAG in sequence.
+    First it will run the provided subdag transformers to transform the source DAG itself
+    Then it will transform the operators in the source dag and create a target DAG out of the
+    returned :class:`~ditto.api.DAGFragment`\'s.
+    """
+
     def __init__(self,
                  target_dag: DAG,
                  transformer_defaults: TransformerDefaultsConf = None,
                  transformer_resolvers: List[TransformerResolver] = None,
                  subdag_transformers: List[Type[SubDagTransformer]] = None,
                  debug_mode: bool = False):
+        """
+        :param target_dag: ditto allows you to provide a pre-fabricated airflow DAG object
+            so that you can set essential parameters like it's ``schedule_interval``, ``params``,
+            give it a unique ``dag_id``, etc. outside of ditto itself, instead of ditto
+            copying the attributes of the DAG over from the source DAG. This gives more flexbility.
+        :param transformer_defaults: allows you to pass a map of transformer type to their default
+            configuration. This is helpful to pass things like a default operator to use when the
+            transformer cannot transform the source operator for some reason, or any other configuration
+            required by the transformer
+        :param transformer_resolvers: resolvers to use to find the transformers for each kind of
+            operator in the source DAG.
+        :param subdag_transformers: subdag transformers to use for converting matching subdags
+            in the source DAG to transformed subdags
+        :param debug_mode: when `True` it will render the intermediate results of transformation
+            using `networkx <https://networkx.github.io/>`_ and `maplotlib <https://matplotlib.org/>`_
+            so that you can debug your transformations easily.
+        """
         self.transformer_cache = {}
         self.target_dag = target_dag
         self.transformer_defaults = transformer_defaults
@@ -32,6 +56,26 @@ class AirflowDagTransformer:
         self.debug_mode = debug_mode
 
     def transform_operators(self, src_dag: DAG):
+        """
+        Transforms the operators in the source DAG and creates the target DAG out of the returned
+        :class:`~ditto.api.DAGFragment`\'s. Finds the transformers by running each operator through
+        all the resolvers passed.
+
+        Does a bread-first-traversal on the source DAG such that the result of the transformation
+        of upstream (and previous ops in this level) are available to downstream transformers in
+        level-order. This is helpful for real world use cases of transformation like having a
+        spark step op transformer read the result of the transformation of a cluster create op transformer.
+
+        Caches the results of transformations to avoid repeat work, as this is a graph, not a tree
+        being traversed.
+
+        .. note::
+
+            Stitches the final target DAG after having transformed all operators.
+
+        :param src_dag: the source airflow DAG to be operator-transformed
+        :return: does not return anything. mutates ``self.target_dag`` directly
+        """
         src_task_q: "Queue[(BaseOperator,DAGFragment)]" = Queue()
         for root in src_dag.roots:
             src_task_q.put((root, None))
@@ -107,6 +151,42 @@ class AirflowDagTransformer:
                                     DAGFragment(all_child_fragment_roots))
 
     def transform_sub_dags(self, src_dag: DAG):
+        """
+        Transforms the subdags of the source DAG, as matched by the :class:`~ditto.api.TaskMatcher`
+        DAG provided by the :class:`~ditto.api.SubDagTransformer`\'s :meth:`~ditto.api.SubDagTransformer.get_sub_dag_matcher`
+        method.
+
+        Multiple subdag transformers can run through the source DAG, and each of them can
+        match+transform multiple subdags of the source DAG, _and_ each such transformation can
+        return multiple subdags as a result, so this can get quite flexible if you want.
+
+        The final DAG is carefully stitched with all the results of the subdag transformations.
+
+        See the unit tests at `test_core.py` for complex examples.
+
+        .. note::
+
+            If your matched input subdag had different leaves pointing to different
+            operators/nodes, the transformed subdags leaves will just get multiplexed
+            to all the leaves of the `source DAG`, since it is not possible to know which
+            new leaf is to be stitched to which node of the source DAG, and resolve
+            new relationships based on old ones.
+
+        .. warning::
+
+            Make sure that you don't provide :class:`~ditto.api.SubDagTransformer`\'s which
+            with overlapping subdag matchers, otherwise things can understandably get messy.
+
+        .. seealso::
+
+            The core logic behind this method lies in a graph algorithm called
+            subgraph isomorphism, and is explained in detail at
+            :meth:`~ditto.utils.TransformerUtils.find_sub_dag`
+
+        :param src_dag: the source airflow DAG to be subdag-transformed
+        :return: does not return anything. mutates the passed ``src_dag`` directly,
+            which is why you should pass a copy of the source DAG.
+        """
         for subdag_transformer_cl in self.subdag_transformers:
             transformer_defaults = None
             if self.transformer_defaults is not None:
@@ -121,6 +201,7 @@ class AirflowDagTransformer:
 
             # transform each matching sub-dag and replace it in the DAG
             cloned_subdags = copy.deepcopy(subdags)
+
             # deep copy since DiGraph holds weak refs and that creates a problem
             # with traversing the DiGraph after deleting nodes from the original airflow DAG
             for subdag, cloned_subdag in zip(subdags, cloned_subdags):
@@ -152,6 +233,15 @@ class AirflowDagTransformer:
                 TransformerUtils.add_downstream_dag_fragment(new_subdag_fragment, DAGFragment(subdag_downstream_tasks))
 
     def transform(self, src_dag: DAG):
+        """
+        This is the entry point to using ditto, and is the only method you
+        should have to call after creating the transformer object. This calls
+        the :meth:`.transform_sub_dags` and :meth:`.transform_operators` methods
+        in sequence to realize the final :attr:`target_dag` and return it
+
+        :param src_dag: the source airflow DAG to be ditto-transformed
+        :return: the resultant transformed DAG
+        """
         # transform sub-DAGs of the src_dag
         if self.subdag_transformers:
             self.transform_sub_dags(src_dag)
@@ -160,6 +250,7 @@ class AirflowDagTransformer:
             rendering.debug_dags(
                 [src_dag],
                 figsize=[14, 14])
+
         # transform each step of the src_dag
         # and add it to the target_dag
         self.transform_operators(src_dag)

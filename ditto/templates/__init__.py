@@ -1,3 +1,4 @@
-from ditto.templates.tf_dmp_template import TdmpEmr2HdiDagTransformerTemplate
-from ditto.templates.tf_dmp_template import CheckClusterSubDagTransformer
 from ditto.templates.emr_hdi_template import EmrHdiDagTransformerTemplate
+from ditto.templates.emr_hdi_check_cluster_template import CheckClusterEmr2HdiDagTransformerTemplate
+
+__all__ = ["EmrHdiDagTransformerTemplate", "CheckClusterEmr2HdiDagTransformerTemplate"]

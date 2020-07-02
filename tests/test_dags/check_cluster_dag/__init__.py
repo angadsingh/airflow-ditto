@@ -5,7 +5,8 @@ from airflow.utils.trigger_rule import TriggerRule
 
 from airflowhdi.operators.azure_hdinsight_create_cluster_operator import ConnectedAzureHDInsightCreateClusterOperator
 from tests.test_commons import *
-from ditto.templates.tf_dmp_template import CheckClusterSubDagTransformer, TdmpEmr2HdiDagTransformerTemplate
+from ditto.templates import CheckClusterEmr2HdiDagTransformerTemplate
+from ditto.transformers.subdag import CheckClusterSubDagTransformer
 from ditto.api import TransformerDefaults, TransformerDefaultsConf
 import tests.test_dags.check_cluster_dag.emr_dag
 import tests.test_dags.check_cluster_dag.expected_hdi_dag
@@ -18,7 +19,7 @@ def transform_call(src_dag: DAG) -> DAG:
                                                                      cluster_name=CLUSTER_NAME,
                                                                      trigger_rule=TriggerRule.ALL_SUCCESS)
 
-    return TdmpEmr2HdiDagTransformerTemplate(DAG(
+    return CheckClusterEmr2HdiDagTransformerTemplate(DAG(
         dag_id='HDI_emr_job_flow_manual_steps_dag',
         default_args=DEFAULT_DAG_ARGS,
         dagrun_timeout=timedelta(hours=2),

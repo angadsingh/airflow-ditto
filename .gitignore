@@ -44,3 +44,5 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+*.egg-info
+docs/_build

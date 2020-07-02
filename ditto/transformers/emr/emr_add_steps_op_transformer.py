@@ -14,8 +14,17 @@ from airflowhdi.operators import LivyBatchOperator
 
 
 class EmrAddStepsOperatorTransformer(OperatorTransformer[EmrAddStepsOperator]):
+    """
+    Transforms the operator :class:`~airflow.contrib.operators.emr_add_steps_operator.EmrAddStepsOperator`
+    """
+
+    #: default livy proxy user
     DEFAULT_PROXY_USER = "admin"
+
+    #: default spark configuration to use
     DEFAULT_SPARK_CONF = {'spark.shuffle.compress': 'false'}
+
+    #: number of mappers to use in case its a distcp
     HADOOP_DISTCP_DEFAULT_MAPPERS = 100
 
     def __init__(self, target_dag: DAG, defaults: TransformerDefaults):
@@ -25,9 +34,34 @@ class EmrAddStepsOperatorTransformer(OperatorTransformer[EmrAddStepsOperator]):
 
     @staticmethod
     def get_target_step_task_id(add_step_task_id, add_step_step_id):
+        """
+        generates a task_id for the transformed output operators
+        for each input EMR step
+        """
         return f"{add_step_task_id}_{add_step_step_id}"
 
     def transform(self, src_operator: BaseOperator, parent_fragment: DAGFragment, upstream_fragments: List[DAGFragment]) -> DAGFragment:
+        """
+        This transformer assumes and relies on the fact that an upstream transformation
+        of a :class:`~airflow.contrib.operators.emr_create_job_flow_operator.EmrCreateJobFlowOperator`
+        has already taken place, since it needs to find the output of that transformation
+        to get the `cluster_name` and `azure_conn_id` from that operator (which should have been a
+        :class:`~airflowhdi.operators.AzureHDInsightCreateClusterOperator`)
+
+        It then goes through the EMR steps of this :class:`~airflow.contrib.operators.emr_add_steps_operator.EmrAddStepsOperator`
+        and creates a :class:`~airflowhdi.operators.LivyBatchOperator` or an :class:`~airflowhdi.operators.AzureHDInsightSshOperator`
+        for each corresponding step, based on grokking the step's params and figuring out whether its a spark job being run
+        on an arbitrary hadoop command like `distcp`, `hdfs` or the like.
+
+        .. note::
+
+            This transformer creates multiple operators from a single source operator
+
+        .. note::
+
+            The spark configuration for the livy spark job are derived from `step['HadoopJarStep']['Properties']` of the EMR step,
+            or could even be specified at the cluster level itself when transforming the job flow
+        """
         create_op_task_id = TransformerUtils.get_task_id_from_xcom_pull(src_operator.job_flow_id)
         create_op: BaseOperator = \
             TransformerUtils.find_op_in_fragment_list(
@@ -109,7 +143,7 @@ class EmrAddStepsOperatorTransformer(OperatorTransformer[EmrAddStepsOperator]):
                     task_id=target_step_task_id,
                     dag=self.dag
                 )
-            self.copy_op_params(step_op, emr_add_steps_op)
+            self.copy_op_attrs(step_op, emr_add_steps_op)
             self.sign_op(step_op)
             step_op.trigger_rule = TriggerRule.ALL_SUCCESS
 

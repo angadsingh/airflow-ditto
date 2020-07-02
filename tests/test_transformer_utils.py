@@ -68,7 +68,7 @@ class TestTransformerUtils(unittest.TestCase):
     ])
     def test_get_step_id_from_xcom_pull(self, test, result):
         self.assertEqual(result,
-                         TransformerUtils.get_step_id_from_xcom_pull(test))
+                         TransformerUtils.get_list_index_from_xcom_pull(test))
 
     @parameterized.expand([
         ('{{ ti.xcom_pull("add_steps_to_cluster", key="return_value")[0] }}',

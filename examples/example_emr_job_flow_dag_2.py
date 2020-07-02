@@ -8,7 +8,8 @@ from ditto import rendering
 from cloud_utils.airflow import xcom_pull
 from cloud_utils.emr import check_for_existing_emr_cluster
 
-from ditto.templates.tf_dmp_template import TdmpEmr2HdiDagTransformerTemplate, CheckClusterSubDagTransformer
+from ditto.templates import CheckClusterEmr2HdiDagTransformerTemplate
+from ditto.transformers.subdag import CheckClusterSubDagTransformer
 
 from datetime import timedelta
 import yaml
@@ -163,7 +164,7 @@ hdi_create_cluster_op = ConnectedAzureHDInsightCreateClusterOperator(task_id="in
                                                                      hdi_conn_id=get_config('hdi')['hdi_conn_id'],
                                                                      cluster_name='inferred',
                                                                      trigger_rule=TriggerRule.ALL_SUCCESS)
-hdidag = TdmpEmr2HdiDagTransformerTemplate(DAG(
+hdidag = CheckClusterEmr2HdiDagTransformerTemplate(DAG(
                 dag_id='HDI_example_emr_job_flow_dag_2',
                 default_args=DEFAULT_ARGS,
                 dagrun_timeout=timedelta(hours=2),

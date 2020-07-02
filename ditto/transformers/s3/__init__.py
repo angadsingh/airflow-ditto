@@ -1,2 +1,4 @@
 from ditto.transformers.s3.s3_key_sensor_blob_transformer import S3KeySensorBlobOperatorTransformer
 from ditto.transformers.s3.s3_key_sensor_adlsgen1_transformer import S3KeySensorAdlsGen1OperatorTransformer
+
+__all__ = ["S3KeySensorBlobOperatorTransformer", "S3KeySensorAdlsGen1OperatorTransformer"]
