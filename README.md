@@ -1,6 +1,6 @@
 # Ditto
 
-[![Documentation Status](https://readthedocs.org/projects/docs/badge/?version=latest)](https://airflow-ditto.readthedocs.io/en/latest/)
+[![Build Status](https://travis-ci.com/angadsingh/airflow-ditto.svg?branch=master)](https://travis-ci.com/angadsingh/airflow-ditto)
 
 Ditto is a framework which allows you to do transformations to an Airflow DAG, to convert it into another DAG which is flow-isomorphic with the original DAG. i.e. it will orchestrate a flow of operators which yields the same results, but was just transformed to run in another environment or platform. The framework was built to transform EMR DAGs to run on Azure HDInsight, but you can extend the rich API for any other kind of transformation. In fact you can transform DAGs such that the result is not isomorphic too if you want (although at that point you're better off writing a whole new DAG).
 
