@@ -41,7 +41,8 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
     'sphinx_paramlinks',
-    'sphinx.ext.intersphinx'
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.githubpages'
 ]
 autodoc_default_flags = ['members']
 autodoc_member_order = 'bysource'
