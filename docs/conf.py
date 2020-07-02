@@ -13,10 +13,6 @@
 import os
 import sys
 
-from recommonmark.transform import AutoStructify
-from sphinx.util.nodes import split_explicit_title
-from docutils import nodes, utils
-
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../'))
 
