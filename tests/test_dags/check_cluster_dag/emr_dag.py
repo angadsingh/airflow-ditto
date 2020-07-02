@@ -1,4 +1,3 @@
-import logging
 from datetime import timedelta
 
 import boto3
@@ -14,8 +13,6 @@ from airflow.contrib.operators.emr_terminate_job_flow_operator \
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 from airflow.utils import trigger_rule
-from cloud_utils.airflow import xcom_pull
-from cloud_utils.emr import check_for_existing_emr_cluster
 
 from tests.test_commons import DEFAULT_DAG_ARGS, EMR_CLUSTER_ID, AWS_CONN_ID, EMR_CONN_ID, CLUSTER_NAME
 
@@ -24,13 +21,17 @@ def handle_failure_task():
     raise AirflowException('Marking DAG as failed due to an upstream failure!')
 
 
+def check_for_existing_emr_cluster(emr_client, cluster_id):
+    print("checking for cluster")
+
+
 def check_for_cluster():
     """
     Checks if an existing cluster should be used for submitting steps.
     """
     emr_client = boto3.client('emr')
     return check_for_existing_emr_cluster(
-        logger=logging.getLogger(), emr_client=emr_client, cluster_id=EMR_CLUSTER_ID)
+        emr_client=emr_client, cluster_id=EMR_CLUSTER_ID)
 
 
 def get_cluster_id(**kwargs):
@@ -39,8 +40,7 @@ def get_cluster_id(**kwargs):
     accept steps, or a newly created cluster.
     """
     cluster_exists_id = EMR_CLUSTER_ID
-    create_cluster_id = xcom_pull(
-        logging.getLogger(), 'return_value', 'create_cluster', **kwargs)
+    create_cluster_id = kwargs['ti'].xcom_pull('return_value', 'create_cluster')
 
     return create_cluster_id if create_cluster_id is not None \
         else cluster_exists_id

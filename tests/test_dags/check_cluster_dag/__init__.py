@@ -10,6 +10,7 @@ from ditto.transformers.subdag import CheckClusterSubDagTransformer
 from ditto.api import TransformerDefaults, TransformerDefaultsConf
 import tests.test_dags.check_cluster_dag.emr_dag
 import tests.test_dags.check_cluster_dag.expected_hdi_dag
+from tests.test_dags.check_cluster_dag.emr_dag import check_for_existing_emr_cluster
 
 
 def transform_call(src_dag: DAG) -> DAG:
@@ -27,4 +28,7 @@ def transform_call(src_dag: DAG) -> DAG:
         schedule_interval=None
     ), transformer_defaults=TransformerDefaultsConf({
         CheckClusterSubDagTransformer: TransformerDefaults(
-            default_operator=create_cluster_op)})).transform(src_dag)
+            default_operator=create_cluster_op,
+            other_defaults={
+                'pycall_check_cluster': check_for_existing_emr_cluster
+            })})).transform(src_dag)

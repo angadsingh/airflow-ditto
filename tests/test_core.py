@@ -8,6 +8,7 @@ import networkx as nx
 from airflow import DAG
 from airflow.contrib.operators.emr_add_steps_operator import EmrAddStepsOperator
 from airflow.contrib.operators.emr_create_job_flow_operator import EmrCreateJobFlowOperator
+from airflow.contrib.operators.file_to_wasb import FileToWasbOperator
 from airflow.contrib.operators.s3_copy_object_operator import S3CopyObjectOperator
 from airflow.contrib.operators.s3_list_operator import S3ListOperator
 from airflow.contrib.operators.spark_submit_operator import SparkSubmitOperator
@@ -16,7 +17,6 @@ from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.email_operator import EmailOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
-from airflow.operators.slack_operator import SlackAPIOperator
 
 from ditto import rendering
 from airflowhdi.operators import LivyBatchOperator
@@ -42,7 +42,7 @@ class TestTransformer1(OperatorTransformer):
             file="foo",
             arguments=["foo"],
             class_name="foo",
-            azure_conn_id=src_operator.token,
+            azure_conn_id=src_operator.file_path,
             cluster_name="foo",
             proxy_user="foo",
             conf=None,
@@ -168,7 +168,7 @@ class TestDagTransformer(unittest.TestCase):
             op3 = S3ListOperator(task_id='op3', bucket='foo')
             op4 = EmrCreateJobFlowOperator(task_id='op4')
             op5 = TriggerDagRunOperator(task_id='op5', trigger_dag_id='foo')
-            op6 = SlackAPIOperator(task_id='op6', token='foo')
+            op6 = FileToWasbOperator(task_id='op6', container_name='foo', blob_name='foo', file_path='foo')
             op7 = EmailOperator(task_id='op7', subject='foo', to='foo', html_content='foo')
             op8 = S3CopyObjectOperator(task_id='op8', dest_bucket_key='foo', source_bucket_key='foo')
             op9 = BranchPythonOperator(task_id='op9', python_callable=print)
@@ -196,7 +196,7 @@ class TestDagTransformer(unittest.TestCase):
             max_active_runs=1,
             schedule_interval=None
         ), transformer_resolvers=[ClassTransformerResolver(
-            {SlackAPIOperator: TestTransformer1}
+            {FileToWasbOperator: TestTransformer1}
         )])
 
         transformer.transform_operators(dag)
@@ -246,7 +246,7 @@ class TestDagTransformer(unittest.TestCase):
             max_active_runs=1,
             schedule_interval=None
         ), transformer_resolvers=[ClassTransformerResolver(
-            {SlackAPIOperator: TestTransformer1,
+            {FileToWasbOperator: TestTransformer1,
              S3CopyObjectOperator: TestTransformer2,
              BranchPythonOperator: TestTransformer3,
              PythonOperator: TestTransformer4}

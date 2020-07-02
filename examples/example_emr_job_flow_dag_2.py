@@ -1,12 +1,9 @@
-import logging
 import os
 
 import boto3
 from airflow.operators.dummy_operator import DummyOperator
 
 from ditto import rendering
-from cloud_utils.airflow import xcom_pull
-from cloud_utils.emr import check_for_existing_emr_cluster
 
 from ditto.templates import CheckClusterEmr2HdiDagTransformerTemplate
 from ditto.transformers.subdag import CheckClusterSubDagTransformer
@@ -59,13 +56,19 @@ def get_config(key):
 def handle_failure_task():
     raise AirflowException('Marking DAG as failed due to an upstream failure!')
 
+
+def check_for_existing_emr_cluster(emr_client, cluster_id):
+    print("checking for cluster")
+
+
 def check_for_cluster():
     """
     Checks if an existing cluster should be used for submitting steps.
     """
     emr_client = boto3.client('emr')
+
     return check_for_existing_emr_cluster(
-        logger=logging.getLogger(), emr_client=emr_client, cluster_id=get_config('emr')['emr_cluster_id'])
+            emr_client=emr_client, cluster_id=get_config('emr')['emr_cluster_id'])
 
 
 def get_cluster_id(**kwargs):
@@ -74,8 +77,7 @@ def get_cluster_id(**kwargs):
     accept steps, or a newly created cluster.
     """
     cluster_exists_id = get_config('emr')['emr_cluster_id']
-    create_cluster_id = xcom_pull(
-        logging.getLogger(), 'return_value', 'create_cluster', **kwargs)
+    create_cluster_id = kwargs['ti'].xcom_pull('return_value', 'create_cluster')
 
     return create_cluster_id if create_cluster_id is not None \
         else cluster_exists_id

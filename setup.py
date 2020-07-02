@@ -18,15 +18,14 @@ setup(
     url="https://github.com/angadsingh/airflow-ditto",
     packages = find_namespace_packages(include=["ditto.*"]),
     install_requires=[
-        'azure-mgmt-hdinsight~=1.5.1',
-        'msrestazure~=0.6.3',
+        'deepdiff==4.3.2',
+        'networkx',
         'apache-airflow>=1.10.10,<=2.*',
-        'azure-storage-blob==2.1.0',
-        'azure-storage-common==2.1.0',
-        'azure-storage-nspkg==3.1.0',
-        'azure-datalake-store',
-        'paramiko',
-        'sshtunnel'
+        'matplotlib',
+        'airflow-hdinsight',
+        'boto3',
+        'parameterized',
+        'alchemy-mock'
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
