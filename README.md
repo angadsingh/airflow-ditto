@@ -37,4 +37,4 @@ You can put the above call in any python file which is visible to airflow and th
 
 ![simple_dag_hdi](https://raw.githubusercontent.com/angadsingh/airflow-ditto/master/README.assets/simple_dag_hdi.png)
 
-Read the detailed documentation [here](https://airflow-ditto.readthedocs.io/)
+Read the detailed documentation [here](https://angadsingh.github.io/airflow-ditto/)
