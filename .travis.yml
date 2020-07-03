@@ -3,14 +3,18 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
+before_install:
+  - pip3 install coverage
 install:
   - python3 setup.py install
   - pip3 install -r docs/requirements
 script:
-  - python3 -m unittest discover -s tests -v
+  - coverage run --source=ditto -m unittest discover -s tests -v
   - cd docs/
   - make html
   - cd -
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 deploy:
   provider: pages
   skip_cleanup: true
