@@ -1,9 +1,9 @@
+.. highlight:: python
+
 A more complex example
 ~~~~~~~~~~~~~~~~~~~~~~
 
-This is how you can transform any EMR operator based DAG to an HDInsight operator based DAG (using operators from the `airflow-hdinsight <https://gitlab.pinsightmedia.com/telco-dmp/airflow-hdinsight>`_ project)
-
-.. code-block:: python
+This is how you can transform any EMR operator based DAG to an HDInsight operator based DAG (using operators from the `airflow-hdinsight <https://gitlab.pinsightmedia.com/telco-dmp/airflow-hdinsight>`_ project)::
 
    ditto = ditto.AirflowDagTransformer(DAG(
        dag_id='HDI_dag',
@@ -49,15 +49,21 @@ There's a lot happening here, but the above example uses (almost) all capabiliti
    :target: README.assets/complex_dag_hdi.png
    :alt: Figure_2
 
+Full example DAGs
+~~~~~~~~~~~~~~~~~
+
+Two example DAGs are provided which showcase the full capability of Ditto at:
+
+ - `examples/example_emr_job_flow_dag.py <https://github.com/angadsingh/airflow-ditto/blob/master/examples/example_emr_job_flow_dag.py>`_
+ - `examples/example_emr_job_flow_dag_2.py <https://github.com/angadsingh/airflow-ditto/blob/master/examples/example_emr_job_flow_dag_2.py>`_
+
 Concepts
 ========
 
 Transformers
 ~~~~~~~~~~~~
 
-At the bottom of the abstraction hierarchy of Ditto's API are :class:`Transformers <ditto.api.Transformer>`.  These are the basic nuts and bolts of the system. These are called from Ditto's core during a transformation to convert the source DAG's operators to the target DAG's operators. There are two types of :class:`Transformers <ditto.api.Transformer>`: :class:`~ditto.api.OperatorTransformer` and :class:`~ditto.api.SubDagTransformer`. We'll talk about the former first, as the latter requires munching up a few more concepts to understand. An example :class:`~ditto.api.OperatorTransformer` could look like this:
-
-.. code-block:: python
+At the bottom of the abstraction hierarchy of Ditto's API are :class:`Transformers <ditto.api.Transformer>`.  These are the basic nuts and bolts of the system. These are called from Ditto's core during a transformation to convert the source DAG's operators to the target DAG's operators. There are two types of :class:`Transformers <ditto.api.Transformer>`: :class:`~ditto.api.OperatorTransformer` and :class:`~ditto.api.SubDagTransformer`. We'll talk about the former first, as the latter requires munching up a few more concepts to understand. An example :class:`~ditto.api.OperatorTransformer` could look like this::
 
    class IAmABasicTransformer(OperatorTransformer):
        def transform(self, src_operator: BaseOperator, parent_fragment: DAGFragment,
@@ -74,9 +80,7 @@ At the bottom of the abstraction hierarchy of Ditto's API are :class:`Transforme
 
 As you can see, it can access the ``src_operator``\ , choose to copy its fields or do whatever it pleases with it in order to create the target operator. :class:`Transformers <ditto.api.Transformer>` return :class:`DAGFragments <ditto.api.DAGFragment>`, which represents an intermediate sub-DAG of the target DAG you're trying to create. :class:`DAGFragments <ditto.api.DAGFragment>` can contain one or an entire sub-DAG of operators, and are linked to each other in a graph structure.
 
-Here's an example of an :class:`~ditto.api.OperatorTransformer` which returns a transformed sub-DAG:
-
-.. code-block:: python
+Here's an example of an :class:`~ditto.api.OperatorTransformer` which returns a transformed sub-DAG::
 
    class IAmASlightlyMoreComplexTransformer(OperatorTransformer):
        def transform(self, src_operator: BaseOperator, parent_fragment: DAGFragment,
@@ -128,17 +132,13 @@ This is where Ditto gets serious, if it did not appear so already. Suppose you w
    :alt: check_cluster_emr_dag
 
 
-In this DAG, there's a pattern we want to match and replace:
-
-.. code-block:: python
+In this DAG, there's a pattern we want to match and replace::
 
    check_for_emr_cluster_op >> [create_cluster_op, cluster_exists_op]
    create_cluster_op >> get_cluster_id_op
    cluster_exists_op >> get_cluster_id_op
 
-The DAG first checks if an EMR cluster exists, creates one if it doesn't and then with getting the cluster ID for downstream tasks. If we wanted to convert this to an HDInsight DAG, we wouldn't need this shebang, because :class:`~airflowhdi.operators.AzureHDInsightCreateClusterOperator` is idempotent, in that it simply does all of the above inside the operator itself (not explicitly, due to the nature of the HDInsight management API simply ignoring the create call if the cluster already exists). So we can cook up the following :class:`~ditto.api.SubDagTransformer` to solve this problem:
-
-.. code-block:: python
+The DAG first checks if an EMR cluster exists, creates one if it doesn't and then with getting the cluster ID for downstream tasks. If we wanted to convert this to an HDInsight DAG, we wouldn't need this shebang, because :class:`~airflowhdi.operators.AzureHDInsightCreateClusterOperator` is idempotent, in that it simply does all of the above inside the operator itself (not explicitly, due to the nature of the HDInsight management API simply ignoring the create call if the cluster already exists). So we can cook up the following :class:`~ditto.api.SubDagTransformer` to solve this problem::
 
    class CheckClusterSubDagTransformer(SubDagTransformer):
        def get_sub_dag_matcher(self) -> List[TaskMatcher]:
@@ -161,16 +161,13 @@ The DAG first checks if an EMR cluster exists, creates one if it doesn't and the
 
 The resulting DAG looks like this:
 
-
 .. image:: README.assets/check_cluster_hdi_dag.png
    :target: README.assets/check_cluster_hdi_dag.png
    :alt: check_cluster_hdi_dag
 
-
 This is very powerful. You can provide multiple :class:`SubDagTransformers <ditto.api.SubDagTransformer>` to Ditto, each one of them can find a sub-DAG and replace it with their own :class:`DAGFragments <ditto.api.DAGFragment>`. The API allows you to declaratively and easily conjure up a :class:`~ditto.api.TaskMatcher` DAG which the transformer will find. :class:`~ditto.api.TaskMatcher` or just ``Matchers`` are similar to :class:`Resolvers <ditto.api.TransformerResolver>`, in that you use them to match on the signature of the operator someway (class-based, python-call-based, or what have you), but they can be expressed as a DAG of :class:`matchers <ditto.api.TaskMatcher>` using the same bitshift assignment you are used to with airflow tasks. Then, behind the scenes, Ditto solves the `subgraph isomorphism problem <https://en.wikipedia.org/wiki/Subgraph_isomorphism_problem>`_\ , which is an `NP-complete problem <https://networkx.github.io/documentation/stable/reference/algorithms/isomorphism.vf2.html>`_\ , of finding a sub-DAG inside another DAG (using the :class:`matchers <ditto.api.TaskMatcher>` as the node equivalence functions!). It uses python `networkx <https://networkx.github.io/>`_ library to do this (with some jugglery to map airflow DAGs and matcher DAGs to networkx graphs and so on). See :meth:`~ditto.utils.TransformerUtils.find_sub_dag` for more details.
 
 Here's a more complex example, where the matching sub-DAG is ``[Matcher(op2,op6), Matcher(op3,op7)] >> Matcher(op4,op8)``\ and the resultant sub-DAG has 5 nodes.
-
 
 .. image:: README.assets/complex_subdag_transformer_src_dag.png
    :target: README.assets/complex_subdag_transformer_src_dag.png
@@ -188,7 +185,7 @@ Templates
 Templates are nothing but a configuration of :class:`OperatorTransformers <ditto.api.OperatorTransformer>`, :class:`Resolvers <ditto.api.TransformerResolver>`, :class:`SubDagTransformers <ditto.api.SubDagTransformer>` and their :class:`Matchers <ditto.api.TaskMatcher>` stitched together with some defaults. You can then reuse templates to transform several DAGs at different places. Templates bring it all together for you to use Ditto conveniently.
 
 API Documentation
-~~~~~~~~~~~~~~~~~
+=================
 
 .. toctree::
    :maxdepth: 2
@@ -199,7 +196,7 @@ API Documentation
    source/ditto.utils
 
 Built-in implementations
-~~~~~~~~~~~~~~~~~~~~~~~~
+========================
 
 Here are some of the built-in implementations of Ditto's API constructs available out of the box. You can find documentation of how each of them behave and work inside their python docstrings themselves.
 

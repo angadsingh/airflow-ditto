@@ -51,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> airflow-ditto
+            <a href="contents.html" class="icon icon-home" alt="Documentation Home"> airflow-ditto
           
 
           
@@ -83,16 +83,67 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="source/ditto.api.html">ditto.api</a></li>
-<li class="toctree-l1"><a class="reference internal" href="source/ditto.ditto.html">ditto.ditto</a></li>
-<li class="toctree-l1"><a class="reference internal" href="source/ditto.rendering.html">ditto.rendering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="source/ditto.utils.html">ditto.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Ditto</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#a-quick-example">A quick example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#a-more-complex-example">A more complex example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#full-example-dags">Full example DAGs</a></li>
 </ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="source/ditto.matchers.html">ditto.matchers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="source/ditto.resolvers.html">ditto.resolvers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="source/ditto.templates.html">ditto.templates</a></li>
-<li class="toctree-l1"><a class="reference internal" href="source/ditto.transformers.html">ditto.transformers</a></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#concepts">Concepts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#transformers">Transformers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#resolvers">Resolvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#subdag-transformers-and-matchers">SubDag Transformers and Matchers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#templates">Templates</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#api-documentation">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/ditto.api.html">ditto.api</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/ditto.ditto.html">ditto.ditto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/ditto.rendering.html">ditto.rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/ditto.utils.html">ditto.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#built-in-implementations">Built-in implementations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/ditto.matchers.html">ditto.matchers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="source/matchers/ditto.matchers.ClassTaskMatcher.html">ClassTaskMatcher</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/matchers/ditto.matchers.PythonCallTaskMatcher.html">PythonCallTaskMatcher</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="source/ditto.resolvers.html">ditto.resolvers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="source/resolvers/ditto.resolvers.ClassTransformerResolver.html">ClassTransformerResolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/resolvers/ditto.resolvers.AncestralClassTransformerResolver.html">AncestralClassTransformerResolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/resolvers/ditto.resolvers.PythonCallTransformerResolver.html">PythonCallTransformerResolver</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="source/ditto.templates.html">ditto.templates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="source/templates/ditto.templates.EmrHdiDagTransformerTemplate.html">EmrHdiDagTransformerTemplate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/templates/ditto.templates.CheckClusterEmr2HdiDagTransformerTemplate.html">CheckClusterEmr2HdiDagTransformerTemplate</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="source/ditto.transformers.html">ditto.transformers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="source/ditto.transformers.emr.html">ditto.transformers.emr</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/transformers/emr/ditto.transformers.emr.EmrAddStepsOperatorTransformer.html">EmrAddStepsOperatorTransformer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/transformers/emr/ditto.transformers.emr.EmrCreateJobFlowOperatorTransformer.html">EmrCreateJobFlowOperatorTransformer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/transformers/emr/ditto.transformers.emr.EmrJobFlowSensorTransformer.html">EmrJobFlowSensorTransformer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/transformers/emr/ditto.transformers.emr.EmrStepSensorTransformer.html">EmrStepSensorTransformer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/transformers/emr/ditto.transformers.emr.EmrTerminateJobFlowOperatorTransformer.html">EmrTerminateJobFlowOperatorTransformer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/ditto.transformers.s3.html">ditto.transformers.s3</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/transformers/s3/ditto.transformers.s3.S3KeySensorAdlsGen1OperatorTransformer.html">S3KeySensorAdlsGen1OperatorTransformer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/transformers/s3/ditto.transformers.s3.S3KeySensorBlobOperatorTransformer.html">S3KeySensorBlobOperatorTransformer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/ditto.transformers.subdag.html">ditto.transformers.subdag</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/transformers/subdag/ditto.transformers.subdag.CheckClusterSubDagTransformer.html">CheckClusterSubDagTransformer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#indices-and-tables">Indices and tables</a></li>
 </ul>
 
             
@@ -108,7 +159,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">airflow-ditto</a>
+          <a href="contents.html">airflow-ditto</a>
         
       </nav>
 
@@ -137,7 +188,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="contents.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>A more complex example</li>
     
@@ -160,7 +211,7 @@
             
   <div class="section" id="a-more-complex-example">
 <h1>A more complex example<a class="headerlink" href="#a-more-complex-example" title="Permalink to this headline">¶</a></h1>
-<p>This is how you can transform any EMR operator based DAG to an HDInsight operator based DAG (using operators from the <a class="reference external" href="https://gitlab.pinsightmedia.com/telco-dmp/airflow-hdinsight">airflow-hdinsight</a> project)</p>
+<p>This is how you can transform any EMR operator based DAG to an HDInsight operator based DAG (using operators from the <a class="reference external" href="https://gitlab.pinsightmedia.com/telco-dmp/airflow-hdinsight">airflow-hdinsight</a> project):</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ditto</span> <span class="o">=</span> <span class="n">ditto</span><span class="o">.</span><span class="n">AirflowDagTransformer</span><span class="p">(</span><span class="n">DAG</span><span class="p">(</span>
     <span class="n">dag_id</span><span class="o">=</span><span class="s1">&#39;HDI_dag&#39;</span><span class="p">,</span>
     <span class="n">default_args</span><span class="o">=</span><span class="n">DEFAULT_DAG_ARGS</span><span class="p">,</span>
@@ -194,6 +245,16 @@
 <a class="reference external image-reference" href="README.assets/complex_dag_emr.png"><img alt="Figure_1" src="_images/complex_dag_emr.png" /></a>
 <p><em>Transformed DAG</em></p>
 <a class="reference external image-reference" href="README.assets/complex_dag_hdi.png"><img alt="Figure_2" src="_images/complex_dag_hdi.png" /></a>
+</div>
+<div class="section" id="full-example-dags">
+<h1>Full example DAGs<a class="headerlink" href="#full-example-dags" title="Permalink to this headline">¶</a></h1>
+<p>Two example DAGs are provided which showcase the full capability of Ditto at:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://github.com/angadsingh/airflow-ditto/blob/master/examples/example_emr_job_flow_dag.py">examples/example_emr_job_flow_dag.py</a></p></li>
+<li><p><a class="reference external" href="https://github.com/angadsingh/airflow-ditto/blob/master/examples/example_emr_job_flow_dag_2.py">examples/example_emr_job_flow_dag_2.py</a></p></li>
+</ul>
+</div></blockquote>
 <div class="section" id="concepts">
 <h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -296,9 +357,8 @@
 <div class="section" id="templates">
 <h1>Templates<a class="headerlink" href="#templates" title="Permalink to this headline">¶</a></h1>
 <p>Templates are nothing but a configuration of <a class="reference internal" href="source/ditto.api.html#ditto.api.OperatorTransformer" title="ditto.api.OperatorTransformer"><code class="xref py py-class docutils literal notranslate"><span class="pre">OperatorTransformers</span></code></a>, <a class="reference internal" href="source/ditto.api.html#ditto.api.TransformerResolver" title="ditto.api.TransformerResolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resolvers</span></code></a>, <a class="reference internal" href="source/ditto.api.html#ditto.api.SubDagTransformer" title="ditto.api.SubDagTransformer"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubDagTransformers</span></code></a> and their <a class="reference internal" href="source/ditto.api.html#ditto.api.TaskMatcher" title="ditto.api.TaskMatcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">Matchers</span></code></a> stitched together with some defaults. You can then reuse templates to transform several DAGs at different places. Templates bring it all together for you to use Ditto conveniently.</p>
-</div>
 <div class="section" id="api-documentation">
-<h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
+<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="source/ditto.api.html">ditto.api</a></li>
@@ -309,7 +369,7 @@
 </div>
 </div>
 <div class="section" id="built-in-implementations">
-<h1>Built-in implementations<a class="headerlink" href="#built-in-implementations" title="Permalink to this headline">¶</a></h1>
+<h2>Built-in implementations<a class="headerlink" href="#built-in-implementations" title="Permalink to this headline">¶</a></h2>
 <p>Here are some of the built-in implementations of Ditto’s API constructs available out of the box. You can find documentation of how each of them behave and work inside their python docstrings themselves.</p>
 <div class="toctree-wrapper compound">
 <ul>
@@ -350,6 +410,7 @@
 </ul>
 </li>
 </ul>
+</div>
 </div>
 </div>
 

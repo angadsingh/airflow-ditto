@@ -53,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> airflow-ditto
+            <a href="../contents.html" class="icon icon-home" alt="Documentation Home"> airflow-ditto
           
 
           
@@ -84,26 +84,68 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="ditto.api.html">ditto.api</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ditto.ditto.html">ditto.ditto</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ditto.rendering.html">ditto.rendering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ditto.utils.html">ditto.utils</a></li>
-</ul>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="ditto.matchers.html">ditto.matchers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ditto.resolvers.html">ditto.resolvers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ditto.templates.html">ditto.templates</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="ditto.transformers.html">ditto.transformers</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="ditto.transformers.emr.html">ditto.transformers.emr</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">ditto.transformers.s3</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="transformers/s3/ditto.transformers.s3.S3KeySensorAdlsGen1OperatorTransformer.html">S3KeySensorAdlsGen1OperatorTransformer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="transformers/s3/ditto.transformers.s3.S3KeySensorBlobOperatorTransformer.html">S3KeySensorBlobOperatorTransformer</a></li>
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Ditto</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#a-quick-example">A quick example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#a-more-complex-example">A more complex example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#full-example-dags">Full example DAGs</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="ditto.transformers.subdag.html">ditto.transformers.subdag</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#concepts">Concepts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#transformers">Transformers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#resolvers">Resolvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#subdag-transformers-and-matchers">SubDag Transformers and Matchers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#templates">Templates</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#api-documentation">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ditto.api.html">ditto.api</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ditto.ditto.html">ditto.ditto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ditto.rendering.html">ditto.rendering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ditto.utils.html">ditto.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html#built-in-implementations">Built-in implementations</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ditto.matchers.html">ditto.matchers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="matchers/ditto.matchers.ClassTaskMatcher.html">ClassTaskMatcher</a></li>
+<li class="toctree-l3"><a class="reference internal" href="matchers/ditto.matchers.PythonCallTaskMatcher.html">PythonCallTaskMatcher</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ditto.resolvers.html">ditto.resolvers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="resolvers/ditto.resolvers.ClassTransformerResolver.html">ClassTransformerResolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="resolvers/ditto.resolvers.AncestralClassTransformerResolver.html">AncestralClassTransformerResolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="resolvers/ditto.resolvers.PythonCallTransformerResolver.html">PythonCallTransformerResolver</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ditto.templates.html">ditto.templates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="templates/ditto.templates.EmrHdiDagTransformerTemplate.html">EmrHdiDagTransformerTemplate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="templates/ditto.templates.CheckClusterEmr2HdiDagTransformerTemplate.html">CheckClusterEmr2HdiDagTransformerTemplate</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="ditto.transformers.html">ditto.transformers</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ditto.transformers.emr.html">ditto.transformers.emr</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="transformers/emr/ditto.transformers.emr.EmrAddStepsOperatorTransformer.html">EmrAddStepsOperatorTransformer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="transformers/emr/ditto.transformers.emr.EmrCreateJobFlowOperatorTransformer.html">EmrCreateJobFlowOperatorTransformer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="transformers/emr/ditto.transformers.emr.EmrJobFlowSensorTransformer.html">EmrJobFlowSensorTransformer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="transformers/emr/ditto.transformers.emr.EmrStepSensorTransformer.html">EmrStepSensorTransformer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="transformers/emr/ditto.transformers.emr.EmrTerminateJobFlowOperatorTransformer.html">EmrTerminateJobFlowOperatorTransformer</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ditto.transformers.s3</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="transformers/s3/ditto.transformers.s3.S3KeySensorAdlsGen1OperatorTransformer.html">S3KeySensorAdlsGen1OperatorTransformer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="transformers/s3/ditto.transformers.s3.S3KeySensorBlobOperatorTransformer.html">S3KeySensorBlobOperatorTransformer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ditto.transformers.subdag.html">ditto.transformers.subdag</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="transformers/subdag/ditto.transformers.subdag.CheckClusterSubDagTransformer.html">CheckClusterSubDagTransformer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#indices-and-tables">Indices and tables</a></li>
 </ul>
 
             
@@ -119,7 +161,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">airflow-ditto</a>
+          <a href="../contents.html">airflow-ditto</a>
         
       </nav>
 
@@ -148,7 +190,9 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../contents.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Ditto</a> &raquo;</li>
         
           <li><a href="ditto.transformers.html">ditto.transformers</a> &raquo;</li>
         
