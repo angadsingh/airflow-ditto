@@ -5,3 +5,16 @@
 .rst-content code.xref, .rst-content tt.xref, a .rst-content code, a .rst-content tt {
     color: #e74c3c;
 }
+
+.rst-content .toctree-wrapper ul {
+    line-height: 20px;
+}
+
+.rst-content .section ul li>* {
+    margin-bottom: 0;
+}
+
+.rst-content .section ul li>ul {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
