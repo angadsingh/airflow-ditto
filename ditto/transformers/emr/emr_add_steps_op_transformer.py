@@ -10,7 +10,7 @@ from ditto.api import OperatorTransformer, TransformerDefaults, DAGFragment, Ups
 from ditto.utils import TransformerUtils
 from airflowhdi.operators.azure_hdinsight_create_cluster_operator import ConnectedAzureHDInsightCreateClusterOperator
 from airflowhdi.operators.azure_hdinsight_ssh_operator import AzureHDInsightSshOperator
-from airflowhdi.operators import LivyBatchOperator
+from airflowlivy.operators.livy_batch_operator import LivyBatchOperator
 
 
 class EmrAddStepsOperatorTransformer(OperatorTransformer[EmrAddStepsOperator]):

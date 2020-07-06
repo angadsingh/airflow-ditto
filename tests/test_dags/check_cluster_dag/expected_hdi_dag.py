@@ -8,9 +8,9 @@ from airflow.utils.trigger_rule import TriggerRule
 
 from airflowhdi.operators.azure_hdinsight_create_cluster_operator import ConnectedAzureHDInsightCreateClusterOperator
 from airflowhdi.operators.azure_hdinsight_delete_cluster_operator import AzureHDInsightDeleteClusterOperator
-from airflowhdi.operators import LivyBatchOperator
+from airflowlivy.operators.livy_batch_operator import LivyBatchOperator
 from airflowhdi.sensors.azure_hdinsight_cluster_sensor import AzureHDInsightClusterSensor
-from airflowhdi.sensors.livy_batch_sensor import LivyBatchSensor
+from airflowlivy.sensors.livy_batch_sensor import LivyBatchSensor
 from tests.test_dags.simple_dag.emr_dag import handle_failure_task
 from tests.test_commons import *
 

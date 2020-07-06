@@ -19,8 +19,8 @@ from airflow.operators.email_operator import EmailOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 
 from ditto import rendering
-from airflowhdi.operators import LivyBatchOperator
-from airflowhdi.sensors import LivyBatchSensor
+from airflowlivy.operators.livy_batch_operator import LivyBatchOperator
+from airflowlivy.sensors.livy_batch_sensor import LivyBatchSensor
 from tests.test_commons import DEFAULT_DAG_ARGS
 from tests.test_utils import TestUtils
 from ditto.utils import TransformerUtils

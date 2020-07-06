@@ -9,8 +9,8 @@ from ditto.api import OperatorTransformer, TransformerDefaults, DAGFragment, Ups
 from ditto.utils import TransformerUtils
 from ditto.transformers.emr import EmrAddStepsOperatorTransformer
 from airflowhdi.operators import ConnectedAzureHDInsightCreateClusterOperator
-from airflowhdi.operators import LivyBatchOperator
-from airflowhdi.sensors.livy_batch_sensor import LivyBatchSensor
+from airflowlivy.operators.livy_batch_operator import LivyBatchOperator
+from airflowlivy.sensors.livy_batch_sensor import LivyBatchSensor
 
 
 class EmrStepSensorTransformer(OperatorTransformer[EmrStepSensor]):
