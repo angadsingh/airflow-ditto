@@ -10,7 +10,7 @@ Ditto is a framework which allows you to do transformations to an Airflow DAG, t
 
 The purpose of the framework is to allow you to maintain one codebase and be able to run your airflow DAGs on different execution environments (e.g. on different clouds, or even different container frameworks - spark on YARN vs kubernetes). It is not meant for a one-time transformation, but for continuous and parallel DAG deployments, although you can use it for that purpose too.
 
-At the heart, Ditto is a graph manipulation library, which extendable APIs for the actual transformation logic. It does come with out of the box support for EMR to HDInsight transformation though.
+At the heart, Ditto is a graph manipulation library, with extendable APIs for the actual transformation logic. It does come with out of the box support for EMR to HDInsight transformation though.
 
 #### Installation
 
