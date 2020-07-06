@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ditto.transformers.emr.emr_add_steps_op_transformer &mdash; airflow-ditto 0.0.1 documentation</title>
+  <title>ditto.transformers.emr.emr_add_steps_op_transformer &mdash; airflow-ditto 0.0.1.2 documentation</title>
   
 
   
@@ -220,7 +220,7 @@
 <span class="kn">from</span> <span class="nn">ditto.utils</span> <span class="kn">import</span> <span class="n">TransformerUtils</span>
 <span class="kn">from</span> <span class="nn">airflowhdi.operators.azure_hdinsight_create_cluster_operator</span> <span class="kn">import</span> <span class="n">ConnectedAzureHDInsightCreateClusterOperator</span>
 <span class="kn">from</span> <span class="nn">airflowhdi.operators.azure_hdinsight_ssh_operator</span> <span class="kn">import</span> <span class="n">AzureHDInsightSshOperator</span>
-<span class="kn">from</span> <span class="nn">airflowhdi.operators</span> <span class="kn">import</span> <span class="n">LivyBatchOperator</span>
+<span class="kn">from</span> <span class="nn">airflowlivy.operators.livy_batch_operator</span> <span class="kn">import</span> <span class="n">LivyBatchOperator</span>
 
 
 <div class="viewcode-block" id="EmrAddStepsOperatorTransformer"><a class="viewcode-back" href="../../../../source/transformers/emr/ditto.transformers.emr.EmrAddStepsOperatorTransformer.html#ditto.transformers.emr.EmrAddStepsOperatorTransformer">[docs]</a><span class="k">class</span> <span class="nc">EmrAddStepsOperatorTransformer</span><span class="p">(</span><span class="n">OperatorTransformer</span><span class="p">[</span><span class="n">EmrAddStepsOperator</span><span class="p">]):</span>
