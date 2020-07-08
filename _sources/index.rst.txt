@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 .. mdinclude:: ../README.md
-   :end-line: 47
+   :end-line: 64
 
 .. include:: readme.rst
 

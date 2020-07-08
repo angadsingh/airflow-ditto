@@ -232,16 +232,31 @@
 <p>Ditto is created for conveniently transforming a large number of DAGs which follow a similar pattern quickly. Here’s how easy it is to use Ditto:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ditto</span> <span class="o">=</span> <span class="n">ditto</span><span class="o">.</span><span class="n">AirflowDagTransformer</span><span class="p">(</span><span class="n">DAG</span><span class="p">(</span>
     <span class="n">dag_id</span><span class="o">=</span><span class="s1">&#39;transformed_dag&#39;</span><span class="p">,</span>
-    <span class="n">default_args</span><span class="o">=</span><span class="n">DEFAULT_DAG_ARGS</span>
+    <span class="n">default_args</span><span class="o">=</span><span class="n">DEFAULT_ARGS</span>
 <span class="p">),</span> <span class="n">transformer_resolvers</span><span class="o">=</span><span class="p">[</span>
-    <span class="n">ClassTransformerResolver</span><span class="p">(</span>
-        <span class="p">{</span><span class="n">SlackAPIOperator</span><span class="p">:</span> <span class="n">TestTransformer1</span><span class="p">,</span>
-         <span class="n">S3CopyObjectOperator</span><span class="p">:</span> <span class="n">TestTransformer2</span><span class="p">,</span>
-         <span class="n">BranchPythonOperator</span><span class="p">:</span> <span class="n">TestTransformer3</span><span class="p">,</span>
-         <span class="n">PythonOperator</span><span class="p">:</span> <span class="n">TestTransformer4</span><span class="p">}</span>
-    <span class="p">)])</span>
-
-<span class="n">new_dag</span> <span class="o">=</span> <span class="n">ditto</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">original_dag</span><span class="p">)</span>
+    <span class="n">AncestralClassTransformerResolver</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="n">EmrCreateJobFlowOperator</span><span class="p">:</span> <span class="n">EmrCreateJobFlowOperatorTransformer</span><span class="p">,</span>
+            <span class="n">EmrJobFlowSensor</span><span class="p">:</span> <span class="n">EmrJobFlowSensorTransformer</span><span class="p">,</span>
+            <span class="n">EmrAddStepsOperator</span><span class="p">:</span> <span class="n">EmrAddStepsOperatorTransformer</span><span class="p">,</span>
+            <span class="n">EmrStepSensor</span><span class="p">:</span> <span class="n">EmrStepSensorTransformer</span><span class="p">,</span>
+            <span class="n">EmrTerminateJobFlowOperator</span><span class="p">:</span> <span class="n">EmrTerminateJobFlowOperatorTransformer</span><span class="p">,</span>
+            <span class="n">S3KeySensor</span><span class="p">:</span> <span class="n">S3KeySensorBlobOperatorTransformer</span>
+        <span class="p">}</span>
+    <span class="p">)],</span> <span class="n">transformer_defaults</span><span class="o">=</span><span class="n">TransformerDefaultsConf</span><span class="p">({</span>
+    <span class="n">EmrCreateJobFlowOperatorTransformer</span><span class="p">:</span> <span class="n">TransformerDefaults</span><span class="p">(</span>
+        <span class="n">default_operator</span><span class="o">=</span> <span class="n">hdi_create_cluster_op</span>
+    <span class="p">)}))</span>
+</pre></div>
+</div>
+<p>or just…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hdi_dag</span> <span class="o">=</span> <span class="n">ditto</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">EmrHdiDagTransformerTemplate</span><span class="p">(</span><span class="n">DAG</span><span class="p">(</span>
+    <span class="n">dag_id</span><span class="o">=</span><span class="s1">&#39;transformed_dag&#39;</span><span class="p">,</span>
+    <span class="n">default_args</span><span class="o">=</span><span class="n">DEFAULT_ARGS</span>
+<span class="p">),</span> <span class="n">transformer_defaults</span><span class="o">=</span><span class="n">TransformerDefaultsConf</span><span class="p">({</span>
+    <span class="n">EmrCreateJobFlowOperatorTransformer</span><span class="p">:</span> <span class="n">TransformerDefaults</span><span class="p">(</span>
+        <span class="n">default_operator</span><span class="o">=</span><span class="n">hdi_create_cluster_op</span>
+    <span class="p">)}))</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">emr_dag</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You can put the above call in any python file which is visible to airflow and the resultant dag loads up thanks to how airflow’s dagbag finds DAGs.</p>
