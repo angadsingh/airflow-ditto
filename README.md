@@ -1,4 +1,4 @@
-# Ditto
+![ditto logo](https://raw.githubusercontent.com/angadsingh/airflow-ditto/master/README.assets/logo.jpg)
 
 [![Build status](https://travis-ci.com/angadsingh/airflow-ditto.svg?branch=master)](https://travis-ci.com/angadsingh/airflow-ditto)
 [![PyPi version](https://img.shields.io/pypi/v/airflow-ditto.svg)](https://pypi.org/project/airflow-ditto)
@@ -52,7 +52,7 @@ hdi_dag = ditto.templates.EmrHdiDagTransformerTemplate(DAG(
         default_operator=hdi_create_cluster_op
     )})).transform(emr_dag)
 ```
- 
+
 You can put the above call in any python file which is visible to airflow and the resultant dag loads up thanks to how airflow's dagbag finds DAGs.
 
 *Source DAG* *(airflow view)*
