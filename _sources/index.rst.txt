@@ -3,7 +3,11 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+Ditto
+=====
+
 .. mdinclude:: ../README.md
+   :start-line: 3
    :end-line: 64
 
 .. include:: readme.rst
