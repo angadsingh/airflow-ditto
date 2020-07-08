@@ -23,16 +23,33 @@ Ditto is created for conveniently transforming a large number of DAGs which foll
 ```python
 ditto = ditto.AirflowDagTransformer(DAG(
     dag_id='transformed_dag',
-    default_args=DEFAULT_DAG_ARGS
+    default_args=DEFAULT_ARGS
 ), transformer_resolvers=[
-    ClassTransformerResolver(
-        {SlackAPIOperator: TestTransformer1,
-         S3CopyObjectOperator: TestTransformer2,
-         BranchPythonOperator: TestTransformer3,
-         PythonOperator: TestTransformer4}
-    )])
+    AncestralClassTransformerResolver(
+        {
+            EmrCreateJobFlowOperator: EmrCreateJobFlowOperatorTransformer,
+            EmrJobFlowSensor: EmrJobFlowSensorTransformer,
+            EmrAddStepsOperator: EmrAddStepsOperatorTransformer,
+            EmrStepSensor: EmrStepSensorTransformer,
+            EmrTerminateJobFlowOperator: EmrTerminateJobFlowOperatorTransformer,
+            S3KeySensor: S3KeySensorBlobOperatorTransformer
+        }
+    )], transformer_defaults=TransformerDefaultsConf({
+    EmrCreateJobFlowOperatorTransformer: TransformerDefaults(
+        default_operator= hdi_create_cluster_op
+    )}))
+```
 
-new_dag = ditto.transform(original_dag)
+or just...
+
+```python
+hdi_dag = ditto.templates.EmrHdiDagTransformerTemplate(DAG(
+    dag_id='transformed_dag',
+    default_args=DEFAULT_ARGS
+), transformer_defaults=TransformerDefaultsConf({
+    EmrCreateJobFlowOperatorTransformer: TransformerDefaults(
+        default_operator=hdi_create_cluster_op
+    )})).transform(emr_dag)
 ```
  
 You can put the above call in any python file which is visible to airflow and the resultant dag loads up thanks to how airflow's dagbag finds DAGs.
