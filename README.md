@@ -38,6 +38,7 @@ ditto = ditto.AirflowDagTransformer(DAG(
     EmrCreateJobFlowOperatorTransformer: TransformerDefaults(
         default_operator= hdi_create_cluster_op
     )}))
+ditto.transform(emr_dag)
 ```
 
 or just...
