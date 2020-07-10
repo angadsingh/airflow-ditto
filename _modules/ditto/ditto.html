@@ -452,6 +452,11 @@
 <span class="sd">        :param src_dag: the source airflow DAG to be ditto-transformed</span>
 <span class="sd">        :return: the resultant transformed DAG</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug_mode</span><span class="p">:</span>
+            <span class="n">rendering</span><span class="o">.</span><span class="n">debug_dags</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">src_dag</span><span class="p">],</span>
+                <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+
         <span class="c1"># transform sub-DAGs of the src_dag</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subdag_transformers</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">transform_sub_dags</span><span class="p">(</span><span class="n">src_dag</span><span class="p">)</span>
