@@ -175,7 +175,10 @@ hdidag = CheckClusterEmr2HdiDagTransformerTemplate(DAG(
                 params=get_config('hdi')
         ),  transformer_defaults=TransformerDefaultsConf({
         CheckClusterSubDagTransformer: TransformerDefaults(
-            default_operator=hdi_create_cluster_op)})).transform(dag)
+            default_operator=hdi_create_cluster_op,
+            other_defaults=
+                {'pycall_check_cluster': check_for_existing_emr_cluster})}),
+        debug_mode=False).transform(dag)
 
 if __name__ == '__main__':
     rendering.debug_dags(

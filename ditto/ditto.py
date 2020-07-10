@@ -242,6 +242,11 @@ class AirflowDagTransformer:
         :param src_dag: the source airflow DAG to be ditto-transformed
         :return: the resultant transformed DAG
         """
+        if self.debug_mode:
+            rendering.debug_dags(
+                [src_dag],
+                figsize=[14, 14])
+
         # transform sub-DAGs of the src_dag
         if self.subdag_transformers:
             self.transform_sub_dags(src_dag)
